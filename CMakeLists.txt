@@ -66,7 +66,7 @@ file( GLOB hdr "src/*.h"  "include/*.h" )
 
 add_executable( "langtonCypher" ${src} ${hdr} ) 
 
-target_link_libraries( "langtonCypher"	# "${ICU_LIBRARIES}"
+target_link_libraries( "langtonCypher" m	# "${ICU_LIBRARIES}"
 				# "${CURL_LIBRARIES}"
 				# "${LIBXML2_LIBRARIES}"
 			       	)
