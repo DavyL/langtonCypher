@@ -1,0 +1,8 @@
+#ifndef LANGTONCYPHER_CONFIG_H
+#define LANGTONCYPHER_CONFIG_H
+
+#define VERSION_MAJOR @langtonCypher_VERSION_MAJOR@
+#define VERSION_MINOR @langtonCypher_VERSION_MINOR@
+
+#endif
+
