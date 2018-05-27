@@ -1,7 +1,9 @@
 ### CMake file for langton cypher
 ###
 ###
-###   - March 2015: Initial version <seb@homedruon.com>
+###	CMake from Sébastien Druon
+###	
+###	---Project started in May 2018---
 ###
 ###
 ###############################################################################
