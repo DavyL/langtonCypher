@@ -1,34 +1,73 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "analysis.h"
 #include "ant.h"
+#include "arbres.h"
 
 #define HEIGHT 5
 #define WIDTH 5
 
-int equivClassesCounter(){
-	struct antStruct * ant = newLattice(HEIGHT, WIDTH, -1);
+int equivClassesCounter(int height, int width){
+	struct antStruct * ant = malloc(sizeof(struct antStruct));
+	ant->x = 0;
+	ant->y = 0;
+	ant->dir = 3;
 
+	int * binary = malloc(height * width * sizeof(int)); 
+	int i = 0;
+	for(i = 0; i < height * width; i ++){
+		binary[i] = -1;
+	}
+	
+	t_abr timeTree = NULL;
 
+	int j = 0;
+	int permNumb = pow(2, height*width);
+	for(j = 0; j < permNumb; j++){
+		printf("Iteration number %d \t/\t %d\n", j, permNumb);
+		ajout_feuille( &timeTree, periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width))); 	
+	}
+	
+	tree2dot(timeTree);
+	tree2tex(timeTree);
+	
+	free(ant);
+	free(binary);
+	free_tree(timeTree);
 
-
+       
+}
+int * binaryClock(int * clock, int clockSize){
+	int i = 0;
+	for( i = 0; i< clockSize ; i++){
+		if(clock[i] == -1){
+			clock[i] = 1;
+			return clock;
+		}
+		clock[i] = -1;
+	}
+	return clock;
 }
 
-struct latticeStruct * binaryToLattice(int binary){
-
+struct latticeStruct * listToLattice(int * list, int height, int width){	//list contains a list of -1 and 1
+												//listToLattice() returns the corrresponding lattice
+	int listSize = height * width;
+	
+	struct latticeStruct * lattice = newLattice(height, width, -1);
+	
+	int i = 0;
+	int j = 0;
+	for(i = 0; i < listSize ; i++){
+		lattice->grid[i%height][i/height] = list[i];
+	}
 
 	return lattice;
 }                                                                           
 
-int ** listToListOfList(int * list, int divisor){
 
-
-	return listOfList;
-}
-
-
-int periodicFinder(struct antStruct * ant, struct latticeStruct * lattice){
+int periodFinder(struct antStruct * ant, struct latticeStruct * lattice){
 	int count = 0;
 	
 	struct latticeStruct * backupLattice = copyLattice(lattice);
@@ -140,7 +179,7 @@ int sizeAnalysis( int maxSize, int color ){				//Prints the size of the loops wi
 			lattice = newLattice(i, j, 0);		//A (white) lattice is defined	
 
 			successor(ant, lattice, 1);	
-			printf("The period of a %d x %d grid is %d\n", i, j, periodicFinder(ant, lattice));
+			printf("The period of a %d x %d grid is %d\n", i, j, periodFinder(ant, lattice));
 		
 			free(lattice);
 		}

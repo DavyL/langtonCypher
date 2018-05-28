@@ -10,13 +10,18 @@ struct countStruct{
 
 };
 
-int compareGrids(struct latticeStruct * lattice, struct latticeStruct * latticeRef);
-int compareAnts(struct antStruct * ant, struct antStruct * antRef);
+int equivClassesCounter(int, int);
+
+int * binaryClock(int * , int );
+struct latticeStruct * listToLattice(int * list, int, int );
+
+int compareGrids(struct latticeStruct * , struct latticeStruct * );
+int compareAnts(struct antStruct * , struct antStruct * );
 
 struct antStruct * copyAnt(struct antStruct *);
-struct latticeStruct * copyLattice(struct latticeStruct * lattice);
+struct latticeStruct * copyLattice(struct latticeStruct * );
 
-int periodicFinder(struct antStruct *, struct latticeStruct *);
+int periodFinder(struct antStruct *, struct latticeStruct *);
 
 int sizeAnalysis( int, int );	
 
