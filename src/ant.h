@@ -12,13 +12,15 @@ struct latticeStruct {
 	int width;
 };
 
-struct latticeStruct * newLattice(int height, int width, int clear);	
+struct latticeStruct * newLattice(int, int , int );	
+
+int randColor(void  );
 
 void * printBasics(struct antStruct *, struct latticeStruct *);
-void * displayGrid(struct latticeStruct * lattice);
+void * displayGrid(struct latticeStruct * );
 
-void * direction(struct antStruct * ant, struct latticeStruct * lattice);
-void * rv_Direction(struct antStruct * ant, struct latticeStruct * lattice);
+void * direction(struct antStruct * , struct latticeStruct * );
+void * rv_Direction(struct antStruct * , struct latticeStruct * );
 
 void * paint(struct antStruct *, struct latticeStruct *);
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "ant.h"
 
@@ -10,20 +11,24 @@ struct latticeStruct * newLattice(int height, int width, int color){
 	lattice->height = height;
 	lattice->width = width;
 	
-	if(color == -1 || color == 1){			//If clear is set to -1 or 1, then the grid will be filled with the value "clear"
-							//Be careful, otherwise the grid will not be clearly defined
+	if(color == -1 || color == 1 || color == 0){			//If color is set to -1 or 1, then the grid will be filled with the value "clear"
+									//If color is set to 0, the grid will be filled randomly with -1 and 1
+									//Be careful, otherwise the grid will not be clearly defined
 		
 		lattice->grid = malloc(height * sizeof(int * ));
 		
 		int i = 0;
 		int j = 0;
+		if(!color){
+			srand(time(NULL));
+		}
 		if(lattice->grid){
 			for( i = 0; i < lattice->height; i++){
 				lattice->grid[i] = malloc( width * sizeof(int));
 				if(lattice->grid[i]){
 					for( j = 0; j < lattice->width; j++){
-						lattice->grid[i][j] = color;		//-1 : white
-											//+1 : black
+						lattice->grid[i][j] = (color) ? color : randColor();		//-1 : white
+														//+1 : black
 					}
 				}else
 					printf("Couldn't allocate memory for lattice width :/\n");
@@ -35,6 +40,10 @@ struct latticeStruct * newLattice(int height, int width, int color){
 
 	return lattice;
 
+}
+
+int randColor( void ){	//srand() shall be called before calling randcolor()
+	return (rand()%2) ? 1 : -1; 	//returns -1 or 1
 }
 
 
