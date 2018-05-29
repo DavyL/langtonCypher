@@ -2,13 +2,14 @@
 #include <stdlib.h>
 
 #include "arbres.h"
+#include "analysis.h"
 
 /* -------------------------------------------------------------------------- */
 
 void save_tree_in_dot_file (t_abr arbre, t_abr father, FILE * file, 
 			    int f_index, int *index) {
   if (arbre) {
-    fprintf (file, "A%d [label=\"%d\"];\n", *index, arbre->val);
+    fprintf (file, "A%d [label=\"%d, %d\"];\n", *index, arbre->data.val, arbre->data.counter);
     if (father) {
       fprintf (file, "A%d -> A%d;\n", f_index, *index);
     } else { fprintf (file, "R -> A%d [color=white];\n", *index); }
@@ -46,7 +47,7 @@ void tree2dot (t_abr arbre) {
 void save_tree_in_tex_file (t_abr arbre, t_abr father, FILE * file) {
   if (arbre) {
     if ((arbre -> fg) || (arbre -> fd)) {
-      fprintf (file, "\\begin{bundle}{%d, %d}\n", arbre->val, arbre->counter);
+      fprintf (file, "\\begin{bundle}{%d, %d}\n", arbre->data.val, arbre->data.counter);
       
       fprintf (file, "\\chunk{\n");
       save_tree_in_tex_file (arbre->fg, arbre, file);
@@ -57,7 +58,7 @@ void save_tree_in_tex_file (t_abr arbre, t_abr father, FILE * file) {
       fprintf (file, "}\n");
 
       fprintf (file, "\\end{bundle}\n");
-    } else { fprintf (file, "%d, %d\n", arbre->val, arbre->counter); }
+    } else { fprintf (file, "%d, %d\n", arbre->data.val, arbre->data.counter); }
   } 
 } /* end of save_tree_in_tex_file_arbre */
 
@@ -120,23 +121,48 @@ t_abr new_abr (int val, t_abr fg , t_abr fd) {
 
   arbre = (t_abr) malloc (sizeof (t_noeud));
   if (arbre) {
-    arbre -> val = val;
+    arbre -> data.val = val;
     arbre -> fg = fg;
     arbre -> fd = fd;
-    arbre -> counter = 0;
+    arbre -> data.counter = 0;
   }
 
   return arbre;
 } /* end of new_abr */
 
-void ajout_feuille (t_abr * arbre, int val) {
+void ajout_feuille (t_abr * arbre, struct countStruct data) {
 	if (*arbre) {
-		if (val < (*arbre) -> val){ 
-	    		ajout_feuille (&((*arbre) -> fg), val);
-    		}else if(val == (*arbre)->val){
-			(*arbre)->counter++;
-		}else ajout_feuille (&((*arbre) -> fd), val);
+		if (data.val < (*arbre) -> data.val){ 
+	    		ajout_feuille (&((*arbre) -> fg), data);
+    		}else if(data.val == (*arbre)->data.val){
+			(*arbre)->data.counter++;
+		}else ajout_feuille (&((*arbre) -> fd), data);
 	} else {
-    		*arbre = new_abr (val, NULL, NULL);
+    		*arbre = new_abr (data.val, NULL, NULL);
   	}
 } /* end of ajout_feuille */
+
+t_abr merge_tree(t_abr * tree1, t_abr * tree2){		//merges tree1 in tree2
+							//After calling this function, tree1 still exists, remember to free() it if necessary
+	if(*tree2){
+		if(* tree1){
+			merge_tree( &((*tree1)->fg), tree2);
+			ajout_feuille( tree2, (*tree1)->data);
+			merge_tree( &((*tree1)->fd), tree2);
+		}
+	}else{
+		printf("In mergeTree(), tree2 is an empty tree\n");
+	}
+
+}
+
+
+
+int  sumCounter(t_abr arbre, int  count){
+	if(arbre){
+		sumCounter( arbre->fg, count);
+		(count) += arbre->data.counter;
+		sumCounter( arbre->fd, count);
+	}
+	return count;
+}

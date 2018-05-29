@@ -6,9 +6,6 @@
 #include "ant.h"
 #include "arbres.h"
 
-#define HEIGHT 5
-#define WIDTH 5
-
 int equivClassesCounter(int height, int width){
 	struct antStruct * ant = malloc(sizeof(struct antStruct));
 	ant->x = 0;
@@ -25,20 +22,33 @@ int equivClassesCounter(int height, int width){
 
 	int j = 0;
 	int permNumb = pow(2, height*width);
-	for(j = 0; j < permNumb; j++){
-		printf("Iteration number %d \t/\t %d\n", j, permNumb);
-		ajout_feuille( &timeTree, periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width))); 	
-	}
 	
+	timeTree = *computeNLattice(&timeTree, ant, binary, permNumb, height, width);
+
 	tree2dot(timeTree);
 	tree2tex(timeTree);
 	
+	int count = 0; 
+	printf("Counter is %d \n", sumCounter( timeTree, count)); 
+
 	free(ant);
 	free(binary);
 	free_tree(timeTree);
 
        
 }
+
+t_abr * computeNLattice(t_abr * timeTree, struct antStruct * ant,int * binary, int n, int height, int width){		//Computes n lattices starting from the binary
+	
+	int j = 0;
+	for(j = 0; j < n; j++){
+		printf("Iteration number %d \t/\t %d\n", j, j);
+		ajout_feuille( timeTree, periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width))); 	
+	}
+	return timeTree;
+}
+
+
 int * binaryClock(int * clock, int clockSize){
 	int i = 0;
 	for( i = 0; i< clockSize ; i++){
@@ -67,21 +77,23 @@ struct latticeStruct * listToLattice(int * list, int height, int width){	//list 
 }                                                                           
 
 
-int periodFinder(struct antStruct * ant, struct latticeStruct * lattice){
-	int count = 0;
+struct countStruct periodFinder(struct antStruct * ant, struct latticeStruct * lattice){
+	struct countStruct data;
+	data.val = 0;
+	data.counter = 1;
 	
 	struct latticeStruct * backupLattice = copyLattice(lattice);
 	struct antStruct * backupAnt = copyAnt(ant);
 
 	do{
 		successor(ant, lattice, 1);
-		count++;
+		data.val++;
 	}while(compareGrids(lattice, backupLattice) || compareAnts(ant, backupAnt));
 	
 	free(backupLattice);
 	free(backupAnt);
 	
-	return count;
+	return data;
 }
 
 struct antStruct * copyAnt(struct antStruct * ant){

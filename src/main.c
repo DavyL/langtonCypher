@@ -15,7 +15,7 @@ int mod(int, int);
 int main( int argc, char ** argv, char **envv){
 	
 	int i = 0;
-	equivClassesCounter(5, 5);
+	equivClassesCounter(3, 3);
 
 }
 
