@@ -146,16 +146,19 @@ t_abr merge_tree(t_abr tree1, t_abr * tree2){		//merges tree1 in tree2
 							//After calling this function, tree1 still exists, remember to free() it if necessary
 		
 	if(tree1){
-		merge_tree(tree1->fg, tree2);
-		ajout_feuille(tree2, tree1->data);
-		printf("tree 1 : val : %d\t counter : %d\n", tree1->data.val, tree1->data.counter);
-		merge_tree(tree1->fd, tree2);
+		if(tree2 != NULL){
+			merge_tree(tree1->fg, tree2);
+			ajout_feuille(tree2, tree1->data);
+			printf("tree 1 : val : %d\t counter : %d\n", tree1->data.val, tree1->data.counter);
+			merge_tree(tree1->fd, tree2);
+		}else{
 
+			*tree2 = tree1;
 
+		}
 	}
-
-
 }
+
 int  sumCounter(t_abr arbre, int  count){
 	if(arbre){
 		sumCounter( arbre->fg, count);

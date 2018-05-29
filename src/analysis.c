@@ -22,10 +22,10 @@ int equivClassesCounter(int height, int width){
 	t_abr tempTree = NULL;
 	int j = 0;
 
-	timeTree = computeNLattice(ant, binary, 1, height, width);
+	//timeTree = computeNLattice(ant, binary, 1, height, width);
 	int permNumb = pow(2, height*width);
-	for(j=1; j < 2; j++){
-		tempTree = computeNLattice(ant, binary, permNumb, height, width);
+	for(j=0; j < permNumb; j++){
+		tempTree = computeNLattice(ant, binary, 1, height, width);
 		merge_tree(tempTree, &timeTree);
 	}
 	
