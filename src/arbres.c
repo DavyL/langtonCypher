@@ -116,48 +116,46 @@ void prof_droite (t_abr arbre) {
   }
 } /* end of prof_droite */
 
-t_abr new_abr (int val, t_abr fg , t_abr fd) {
+t_abr new_abr (struct countStruct data, t_abr fg , t_abr fd) {
   t_abr arbre;
 
   arbre = (t_abr) malloc (sizeof (t_noeud));
   if (arbre) {
-    arbre -> data.val = val;
+    arbre -> data.val = data.val;
     arbre -> fg = fg;
     arbre -> fd = fd;
-    arbre -> data.counter = 0;
+    arbre -> data.counter = 1;
   }
-
   return arbre;
 } /* end of new_abr */
 
 void ajout_feuille (t_abr * arbre, struct countStruct data) {
-	if (*arbre) {
+	if (*arbre) {	
 		if (data.val < (*arbre) -> data.val){ 
 	    		ajout_feuille (&((*arbre) -> fg), data);
     		}else if(data.val == (*arbre)->data.val){
-			(*arbre)->data.counter++;
+			(*arbre)->data.counter += data.counter;			//Remettre data.counter
 		}else ajout_feuille (&((*arbre) -> fd), data);
 	} else {
-    		*arbre = new_abr (data.val, NULL, NULL);
+		printf("vreatinf new abr\n");
+    		*arbre = new_abr (data, NULL, NULL);
   	}
 } /* end of ajout_feuille */
 
-t_abr merge_tree(t_abr * tree1, t_abr * tree2){		//merges tree1 in tree2
+t_abr merge_tree(t_abr tree1, t_abr * tree2){		//merges tree1 in tree2
 							//After calling this function, tree1 still exists, remember to free() it if necessary
-	if(*tree2){
-		if(* tree1){
-			merge_tree( &((*tree1)->fg), tree2);
-			ajout_feuille( tree2, (*tree1)->data);
-			merge_tree( &((*tree1)->fd), tree2);
-		}
-	}else{
-		printf("In mergeTree(), tree2 is an empty tree\n");
+		
+	if(tree1){
+		merge_tree(tree1->fg, tree2);
+		ajout_feuille(tree2, tree1->data);
+		printf("tree 1 : val : %d\t counter : %d\n", tree1->data.val, tree1->data.counter);
+		merge_tree(tree1->fd, tree2);
+
+
 	}
 
+
 }
-
-
-
 int  sumCounter(t_abr arbre, int  count){
 	if(arbre){
 		sumCounter( arbre->fg, count);

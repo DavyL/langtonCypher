@@ -11,7 +11,7 @@ int equivClassesCounter(int, int);
 int * binaryClock(int * , int );
 struct latticeStruct * listToLattice(int * list, int, int );
 
-t_abr * computeNLattice(t_abr *, struct antStruct *, int *, int, int, int);
+t_abr computeNLattice(struct antStruct *, int *, int, int, int);
 
 int compareGrids(struct latticeStruct * , struct latticeStruct * );
 int compareAnts(struct antStruct * , struct antStruct * );

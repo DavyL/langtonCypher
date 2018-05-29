@@ -19,14 +19,18 @@ int equivClassesCounter(int height, int width){
 	}
 	
 	t_abr timeTree = NULL;
-
+	t_abr tempTree = NULL;
 	int j = 0;
-	int permNumb = pow(2, height*width);
-	
-	timeTree = *computeNLattice(&timeTree, ant, binary, permNumb, height, width);
 
-	tree2dot(timeTree);
-	tree2tex(timeTree);
+	timeTree = computeNLattice(ant, binary, 1, height, width);
+	int permNumb = pow(2, height*width);
+	for(j=1; j < 2; j++){
+		tempTree = computeNLattice(ant, binary, permNumb, height, width);
+		merge_tree(tempTree, &timeTree);
+	}
+	
+	//tree2dot(timeTree);
+	//tree2tex(timeTree);
 	
 	int count = 0; 
 	printf("Counter is %d \n", sumCounter( timeTree, count)); 
@@ -34,18 +38,31 @@ int equivClassesCounter(int height, int width){
 	free(ant);
 	free(binary);
 	free_tree(timeTree);
-
        
 }
 
-t_abr * computeNLattice(t_abr * timeTree, struct antStruct * ant,int * binary, int n, int height, int width){		//Computes n lattices starting from the binary
+t_abr computeNLattice(struct antStruct * ant,int * binary, int n, int height, int width){		//Computes n lattices starting from the binary
+
+	t_abr tempTimeTree = NULL;
+
+	struct countStruct data;
+
+	data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
+	
+	tempTimeTree = new_abr(data, NULL, NULL);
 	
 	int j = 0;
 	for(j = 0; j < n; j++){
-		printf("Iteration number %d \t/\t %d\n", j, j);
-		ajout_feuille( timeTree, periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width))); 	
+		printf("Iteration number %d \t/\t %d\n", j, n);
+		
+		data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
+		
+		printf("data : val : %d\t counter : %d\n", data.val, data.counter);
+		
+		ajout_feuille(&tempTimeTree, data);
+		
 	}
-	return timeTree;
+	return tempTimeTree;
 }
 
 
