@@ -17,7 +17,7 @@ int main( int argc, char ** argv, char **envv){
 	
 	int i = 0;
 	//equivClassesCounter(2, 2);
-	mainServ();
+	mainServ( 10, 1024);
 }
 
 
