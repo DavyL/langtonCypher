@@ -18,6 +18,6 @@ t_abr new_abr (struct countStruct, t_abr, t_abr);
 
 t_abr merge_tree(t_abr , t_abr * );
 
-int sumCounter(t_abr , int );
+int sumCounter(t_abr , int *);
 
 #endif

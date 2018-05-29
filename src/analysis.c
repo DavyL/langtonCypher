@@ -32,7 +32,8 @@ int equivClassesCounter(int height, int width){
 	//tree2dot(timeTree);
 	//tree2tex(timeTree);
 	
-	int count = 0; 
+	int * count = malloc(sizeof(int));
+        *count = 0;	
 	printf("Counter is %d \n", sumCounter( timeTree, count)); 
 
 	free(ant);
@@ -49,16 +50,12 @@ t_abr computeNLattice(struct antStruct * ant,int * binary, int n, int height, in
 
 	data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
 	
-	tempTimeTree = new_abr(data, NULL, NULL);
-	
 	int j = 0;
 	for(j = 0; j < n; j++){
 		printf("Iteration number %d \t/\t %d\n", j, n);
 		
 		data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
-		
-		printf("data : val : %d\t counter : %d\n", data.val, data.counter);
-		
+				
 		ajout_feuille(&tempTimeTree, data);
 		
 	}
