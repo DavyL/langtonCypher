@@ -6,6 +6,7 @@
 #include "ant.h"
 #include "analysis.h"
 #include "arbres.h"
+#include "server.h"
 
 #define HEIGHT 5
 #define WIDTH 5
@@ -15,8 +16,8 @@ int mod(int, int);
 int main( int argc, char ** argv, char **envv){
 	
 	int i = 0;
-	equivClassesCounter(3, 3);
-
+	//equivClassesCounter(2, 2);
+	mainServ();
 }
 
 

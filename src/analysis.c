@@ -35,6 +35,9 @@ int equivClassesCounter(int height, int width){
 	int * count = malloc(sizeof(int));
         *count = 0;	
 	printf("Counter is %d \n", sumCounter( timeTree, count)); 
+	printf("Number of equivalence class is %d \n", elemCounter( timeTree, count)); 
+	printf("Number of equivalence class with multiplicity %d \n", sumProductCounter( timeTree, count)); 
+
 
 	free(ant);
 	free(binary);

@@ -8,13 +8,12 @@ struct countStruct{
 	
 	int val;
 	int counter;
-
+	
 };
-
 
 typedef struct _t_noeud {
   struct countStruct data;
-  struct _t_noeud *fg, *fd;
+  struct _t_noeud *fg, *fd; 
 } t_noeud;
 
 typedef t_noeud * t_abr;

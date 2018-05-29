@@ -134,7 +134,7 @@ void ajout_feuille (t_abr * arbre, struct countStruct data) {
 		if (data.val < (*arbre) -> data.val){ 
 	    		ajout_feuille (&((*arbre) -> fg), data);
     		}else if(data.val == (*arbre)->data.val){
-			(*arbre)->data.counter += data.counter;			//Remettre data.counter
+			(*arbre)->data.counter += data.counter;	
 		}else ajout_feuille (&((*arbre) -> fd), data);
 	} else {
     		*arbre = new_abr (data, NULL, NULL);
@@ -143,7 +143,6 @@ void ajout_feuille (t_abr * arbre, struct countStruct data) {
 
 t_abr merge_tree(t_abr tree1, t_abr * tree2){		//merges tree1 in tree2
 							//After calling this function, tree1 still exists, remember to free() it if necessary
-		
 	if(tree1){
 		if(tree2 != NULL){
 			merge_tree(tree1->fg, tree2);
@@ -151,7 +150,6 @@ t_abr merge_tree(t_abr tree1, t_abr * tree2){		//merges tree1 in tree2
 			merge_tree(tree1->fd, tree2);
 		}else{
 			*tree2 = tree1;
-
 		}
 	}
 }
@@ -160,6 +158,24 @@ int  sumCounter(t_abr arbre, int * count){
 	if(arbre){
 		sumCounter( arbre->fg, count);
 		(*count) += arbre->data.counter;
+		sumCounter( arbre->fd, count);
+	}
+	return *count;
+}
+
+int  sumProductCounter(t_abr arbre, int * count){
+	if(arbre){
+		sumCounter( arbre->fg, count);
+		(*count) += arbre->data.counter * arbre->data.val;
+		sumCounter( arbre->fd, count);
+	}
+	return *count;
+}
+
+int  elemCounter(t_abr arbre, int * count){
+	if(arbre){
+		sumCounter( arbre->fg, count);
+		(*count) += 1;
 		sumCounter( arbre->fd, count);
 	}
 	return *count;
