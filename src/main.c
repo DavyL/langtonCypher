@@ -8,8 +8,6 @@
 #include "arbres.h"
 #include "server.h"
 
-#define HEIGHT 5
-#define WIDTH 5
 
 int mod(int, int);
 
@@ -17,7 +15,17 @@ int main( int argc, char ** argv, char **envv){
 	
 	int i = 0;
 	//equivClassesCounter(2, 2);
-	mainServ( 10, 1024);
+	
+	int minHeight = 4;
+	int minWidth  = 4;
+	
+	int maxHeight = 5;
+	int maxWidth  = 5;
+
+	int listSize 	= 10;
+	int blockSize 	= 1024;
+
+	mainServ(minHeight, minWidth, maxHeight, maxWidth, listSize, blockSize);
 }
 
 

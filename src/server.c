@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "struct.h"
 #include "server.h"
@@ -8,9 +9,7 @@
 #include "analysis.h"
 #include "utils.h"
 
-#define LIST_SIZE 10
-#define BLOCK_SIZE 1024
-int mainServ(int listSize, int blockSize){
+int mainServ(int minHeight, int minWidth, int maxHeight, int maxWidth, int listSize, int blockSize){
 
 	printf("Entering mainServ()\n");
 
@@ -19,44 +18,113 @@ int mainServ(int listSize, int blockSize){
 	ant->x = 0;
 	ant->y=0;	
 	
-	int height = 4;
-	int width = 4;
+	int currHeight = 0;
+	int currWidth = 0;
 
-	int ** timeList = malloc( listSize * sizeof(int *));
-	int * lastSent = malloc(height * width * sizeof(int));
-
-	t_abr timeTree = NULL;
+	int ** timeList = NULL;
 
 	int numElem = 0;
-	
 	int i = 0;
-	for(i = 0; i < listSize; i++){
-
-		timeList[i] = malloc( height * width * sizeof(int));
-		fillList(timeList[i], -1, height, width);
-	}
 	
+	int j = 0;
+
+	int * count = malloc(sizeof(int));
+	*count = 0;
+
+	struct packetStruct packet;
+	
+	packet.listSize = listSize;
+	packet.ant = ant;
+	packet.tree = NULL;
+	packet.binary = NULL;
+
+	int * lastSent = NULL;
+
+	for(currHeight = minHeight; currHeight <= maxHeight; currHeight ++){
+		for( currWidth = minWidth; currWidth <= currHeight; currWidth ++){
+			
+			lastSent = malloc(currWidth * currHeight * sizeof(int));
+	
+			fillList(lastSent, -1, currHeight, currWidth);
+
+			if( blockSize > pow(2,currHeight * currWidth)){
+
+				packet.blockSize = pow(2, currHeight * currWidth);
+				printf("BlockSize is too large (%d > %d x %d ) , resizing it to %d \n", blockSize, currHeight, currWidth, packet.blockSize);	
+			}else{
+			 	packet.blockSize = blockSize;
+			}
 
 
-	if(numElem = numElemList(timeList, height, width, listSize) > listSize/2){
-		printf("Time list contains %d  elements, starting to clear it\n", numElem);	
-		sendToCli( timeList[ extractElemFromTimeList(timeList, height, width, listSize) ], ant, blockSize, height, width); 
+			printf("Starting grid : %d x %d\n", currHeight, currWidth);			
 
-	}else{
-		printf("Time list contains %d elements\n", numElem);
-		lastSent = binaryClock(copyList(NULL, timeList[0], height, width), blockSize);
-		sendToCli(lastSent, ant, blockSize, height, width); 
-		addElem(timeList, lastSent, height, width, listSize);
+			packet.height = currHeight;
+			packet.width = currWidth;
 
+			timeList = malloc( listSize * sizeof(int *));
+			packet.binary = malloc( currHeight * currWidth * sizeof(int));
+
+			numElem = 0;
+			
+			i = 0;
+			for(i = 0; i < listSize - 1; i++){
+
+				timeList[i] = malloc( currHeight * currWidth * sizeof(int));
+				fillList(timeList[i], -1, currHeight, currWidth);
+			}
+	
+			//copyList(lastSent, timeList[0], currHeight, currWidth);
+
+			if(numElem = numElemList(timeList, currHeight, currWidth, listSize - 1) > listSize/2){
+				printf("Time list contains %d  elements, starting to clear it\n", numElem);	
+				packet.binary = timeList[ extractElemFromTimeList(timeList, currHeight, currWidth, listSize) ];		
+				sendToCli( packet ); 
+
+			}else{
+				printf("Time list contains %d elements\n", numElem);
+				lastSent = copyList(NULL, timeList[0], currHeight, currWidth), packet.blockSize;
+				addElem(timeList, lastSent, currHeight, currWidth, listSize);
+				packet.binary = lastSent;
+				sendToCli( packet ); 
+				
+				//addElem(timeList, packet.binary, currHeight, currWidth, listSize);
+
+			}
+	
+		printf("The grid  of size : %d x %d has been computed\n", currHeight, currWidth);
+		printf("Counter is %d \n", sumCounter( packet.tree, count)); 
+		printf("Number of equivalence class is %d \n", elemCounter( packet.tree, count)); 
+		printf("Number of equivalence class with multiplicity %d \n", sumProductCounter( packet.tree, count));
+
+
+		
+		if(lastSent != NULL){
+			free(lastSent);
+		}
+
+		free_tree(packet.tree);	
+
+		free(ant);
+		
+		for(j = 0; j < listSize; j++){
+			if(timeList[j] != NULL){
+				free(timeList[j]);
+			}else{
+				printf("Trying to free() timeList[%d], but it is a NULL pointer\n", j);
+			}
+		}
+		free(timeList);
+	
+		}
 	}
 }
 
-int sendToCli(int * binary, struct antStruct * ant, int blockSize, int height, int width){
+int sendToCli(struct packetStruct packet){
 
 	printf("Sending : ");
-	displayBinary(binary, height, width);
+	displayBinary(packet.binary, packet.height, packet.width);
 	printf(" to client\n");	
-	mainCli(binary, ant, blockSize, height, width);
+	mainCli(packet);
 
 }
 

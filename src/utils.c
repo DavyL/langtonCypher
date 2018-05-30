@@ -15,8 +15,17 @@ int numElemList( int ** timeList, int height, int width, int listSize){		//Retur
 
 int extractElemFromTimeList(int ** timeList, int height, int width, int listSize){ 	//Returns the position of a non-zero elem from timeList
 
+	if(timeList == NULL){
+		printf("In extractElemFromTimeList(), timeList is a NULL pointer\n");
+		return -1;
+
+	}
 	int i = 0;
 	for(i = 0; i < listSize; i++){
+		if(timeList[i] == NULL){
+			printf("In extractElemFromTimeList(), timeList[%d] is a NULL pointer\n", i);
+			return -1;
+		}
 		if(!isEmpty(timeList[i], height, width)){
 			return i;
 		}
@@ -38,6 +47,12 @@ int * popElemFromTimeList(int ** timeList, int height, int width, int listSize){
 
 int * fillList(int * binary, int val, int height, int width){
 
+	if(binary == NULL){
+		printf("In fillList(), the binary is a NULL pointer\n");
+		return NULL;
+	}
+	
+	
 	int i = 0;
 	for(i = 0; i < height * width; i ++){
 		binary[i] = val;
@@ -77,6 +92,13 @@ int * copyList( int * list1, int * list2, int height, int width){	//Moves elemen
 }
 
 int isEmpty( int * binary, int height, int width){		//returns 1 if the list is empty, i.e, contains only -1
+
+	if( binary == NULL){
+
+		printf("In isEmpty(), the binary is a NULL pointer\n");
+		return -1;
+
+	}
 
 	int i = 0;
 	for( i = 0; i < height * width; i ++){

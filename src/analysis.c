@@ -45,17 +45,29 @@ int equivClassesCounter(int height, int width){
        
 }
 
+struct packetStruct computePacket( struct packetStruct packet ){
+
+	packet.tree = computeNLattice(packet.ant, packet.binary, packet.blockSize, packet.height, packet.width);
+	return packet;
+}
+
+
 t_abr computeNLattice(struct antStruct * ant,int * binary, int n, int height, int width){		//Computes n lattices starting from the binary
 
 	t_abr tempTimeTree = NULL;
 
 	struct countStruct data;
 
-	data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
+	
+
+	//data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
 	
 	int j = 0;
+	printf("Starting to compute %d lattice starting from : ", n);
+	displayBinary( binary, height, width );
+	printf("\n");
 	for(j = 0; j < n; j++){
-		printf("Iteration number %d \t/\t %d\n", j, n);
+		//printf("Iteration number %d \t/\t %d\n", j, n);
 		
 		data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
 				
@@ -101,6 +113,12 @@ struct countStruct periodFinder(struct antStruct * ant, struct latticeStruct * l
 	
 	struct latticeStruct * backupLattice = copyLattice(lattice);
 	struct antStruct * backupAnt = copyAnt(ant);
+
+	if(backupLattice == NULL || backupAnt == NULL){
+
+		printf("In periodFinder(), backupAnt and/or backupLattice are/is NULL pointer\n");
+
+	}
 
 	do{
 		successor(ant, lattice, 1);
@@ -205,7 +223,7 @@ int sizeAnalysis( int maxSize, int color ){				//Prints the size of the loops wi
 	int j = 0;
 	for(i = 1; i < maxSize; i++){
 		for(j = 1; j <= i; j++){
-			lattice = newLattice(i, j, 0);		//A (white) lattice is defined	
+			lattice = newLattice(i, j, 0);		//A random lattice is defined	
 
 			successor(ant, lattice, 1);	
 			printf("The period of a %d x %d grid is %d\n", i, j, periodFinder(ant, lattice));

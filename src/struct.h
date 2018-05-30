@@ -18,4 +18,20 @@ typedef struct _t_noeud {
 
 typedef t_noeud * t_abr;
 
+struct packetStruct{
+
+	t_abr tree;
+
+	struct antStruct * ant;
+
+	int height;
+	int width;
+
+	int blockSize;
+
+	int listSize;
+
+	int * binary;
+};
+
 #endif
