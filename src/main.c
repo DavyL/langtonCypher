@@ -19,8 +19,8 @@ int main( int argc, char ** argv, char **envv){
 	int minHeight = 4;
 	int minWidth  = 4;
 	
-	int maxHeight = 5;
-	int maxWidth  = 5;
+	int maxHeight = 6;
+	int maxWidth  = 6;
 
 	int listSize 	= 10;
 	int blockSize 	= 1024;
