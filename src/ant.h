@@ -30,4 +30,6 @@ void * rvMove( struct antStruct *, struct latticeStruct *);
 int successor( struct antStruct *, struct latticeStruct *, int );
 int predecessor( struct antStruct *, struct latticeStruct *, int );
 
+int freeLattice( struct latticeStruct *);
+
 #endif

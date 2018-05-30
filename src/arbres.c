@@ -28,18 +28,24 @@ void save_tree_in_dot_file (t_abr arbre, t_abr father, FILE * file,
 
 /* -------------------------------------------------------------------------- */
 
-void tree2dot (t_abr arbre) {
+void tree2dot (t_abr arbre, int height, int width) {
   FILE * file;
   int index = 1;
+  char filename[sizeof "pdf/tree10x10.dot"];
+  sprintf(filename, "pdf/file%02dx%02d.dot", height, width);
+  file 	= fopen(filename, "w");
 
-  file = fopen("tree.dot", "w");
   fprintf (file, "digraph G {\n");
   fprintf (file, "R [label=\"\",color=white];\n");
 
   save_tree_in_dot_file (arbre, NULL, file,0, &index);
   fprintf (file, "}\n");
   fclose (file);
-  system ("dot -Tjpg -o tree.jpg tree.dot");
+
+   char command[sizeof "dot -Tjpg -o pdf/tree10x10.jpg pdf/tree10x10.dot"];
+   sprintf(command, "dot -Tjpg -o pdf/tree%02dx%02d.jpg pdf/tree%02dx%02d.dot", height, width, height, width);
+
+  system (command);
 } /* end of tree2dot */
 
 /* -------------------------------------------------------------------------- */
@@ -64,10 +70,11 @@ void save_tree_in_tex_file (t_abr arbre, t_abr father, FILE * file) {
 
 /* -------------------------------------------------------------------------- */
 
-void tree2tex (t_abr arbre) {
+void tree2tex (t_abr arbre, int height, int width) {
   FILE * file;
-
-  file = fopen("tree.tex", "w");
+  char filename[sizeof "pdf/tree10x10.tex"];
+  sprintf(filename, "pdf/tree%02dx%02d.tex", height, width);
+  file 	= fopen(filename, "w");
   fprintf (file, "\\documentclass[landscape]{article}\n");
   fprintf (file, "\\usepackage[francais]{babel}\n");
   fprintf (file, "\\usepackage[latin1]{inputenc}\n");
@@ -79,7 +86,11 @@ void tree2tex (t_abr arbre) {
   save_tree_in_tex_file (arbre, NULL, file);
   fprintf (file, "\\end{document}\n");
   fclose (file);
-  system ("latex tree.tex; dvips -t a4 -t landscape tree -o tree.ps; convert tree.ps tree.jpg");
+  char command[sizeof "latex pdf/tree10x10.tex; dvips -t a4 -t landscape tree -o pdf/tree10x10.ps; convert pdf/tree10x10 pdf/tree10x10.jpg"];
+  sprintf(command, "latex pdf/tree%02dx%02d.tex; dvips -t a4 -t landscape tree -o pdf/tree%02dx%02d.ps; convert pdf/tree%02dx%02d.ps pdf/tree%02dx%02d.jpg", height, width, height, width, height, width, height, width);
+
+  system (command);
+//ystem ("latex tree.tex; dvips -t a4 -t landscape tree -o tree.ps; convert tree.ps tree.jpg");
 } /* end of tree2tex */
 
 /* -------------------------------------------------------------------------- */

@@ -35,6 +35,7 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	do{
 		packetRcv = sendToCli( packetSnd );
 		merge_tree(packetRcv.tree, &mainTree);
+		free_tree(packetRcv.tree);
 	}while( !isEmpty(packetRcv.binary, packetRcv.height, packetRcv.width));
 
 	int * count = malloc(sizeof(int));
@@ -47,8 +48,8 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	printf("Number of equivalence class is %d \n", elemCounter( mainTree, elem)); 
 	printf("Number of equivalence class with multiplicity %d \n", sumProductCounter( mainTree, sumProd)); 
 
-	tree2dot(mainTree);
-	tree2tex(mainTree);
+	tree2dot(mainTree, packetSnd.height, packetSnd.width);
+	tree2tex(mainTree, packetSnd.height, packetSnd.width);
 
 
 
