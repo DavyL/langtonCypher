@@ -9,110 +9,61 @@
 #include "analysis.h"
 #include "utils.h"
 
-int mainServ(int minHeight, int minWidth, int maxHeight, int maxWidth, int listSize, int blockSize){
+#include "client.h"
 
-	printf("Entering mainServ()\n");
+int mainServ(struct antStruct * ant, int height, int width, int listSize, int blockSize){
 
-	int ** timeList = malloc( listSize * sizeof(int *));
-	
-	struct antStruct * ant = malloc(sizeof(struct antStruct));
-	ant->dir = 3;
-	ant->x = 0;
-	ant->y=0;	
-	
-	int currHeight = 0;
-	int currWidth = 0;
+	printf("Entering mainServ() on a %d x %d grid, list size : %d, blocksize : %d\n", height, width, listSize, blockSize);	
 
-	int numElem = 0;
-	int i = 0;
+	struct packetStruct packetSnd;
+	packetSnd.height 	= height;
+	packetSnd.width 	= width;
+	packetSnd.listSize 	= listSize;
+	packetSnd.blockSize 	= blockSize;
+	packetSnd.ant 		= malloc(sizeof(ant));
+	packetSnd.ant->dir 	= ant->dir;
+	packetSnd.ant->x 	= ant->x;
+	packetSnd.ant->y 	= ant->y;
+	packetSnd.binary 	= malloc( packetSnd.height * packetSnd.width * sizeof(int));
+	packetSnd.binary 	= fillList( packetSnd.binary, -1, packetSnd.height, packetSnd.width);
 	
-	int j = 0;
+	struct packetStruct packetRcv;
+	packetRcv.ant	 	= malloc(sizeof(ant));
+
+	t_abr mainTree = NULL;
+
+	do{
+		packetRcv = sendToCli( packetSnd );
+		merge_tree(packetRcv.tree, &mainTree);
+		free_tree(packetRcv.tree);
+	}while( !isEmpty(packetRcv.binary, packetRcv.height, packetRcv.width));
 
 	int * count = malloc(sizeof(int));
-	*count = 0;
+        int * elem = malloc(sizeof(int));
+	int * sumProd = malloc(sizeof(int));
+	*count 	= 0;
+	*elem 	= 0;
+	*sumProd= 0;	
+	printf("Counter is %d \n", sumCounter( mainTree, count)); 
+	printf("Number of equivalence class is %d \n", elemCounter( mainTree, elem)); 
+	printf("Number of equivalence class with multiplicity %d \n", sumProductCounter( mainTree, sumProd)); 
 
-	struct packetStruct packet;
-	
-	packet.listSize = listSize;
-	packet.ant = ant;
-	packet.tree = NULL;
-	packet.binary = NULL;
 
-	int * lastSent = NULL;
-
-	for(currHeight = minHeight; currHeight <= maxHeight; currHeight ++){
-		for( currWidth = minWidth; currWidth <= currHeight; currWidth ++){
-			
-			printf("Starting grid : %d x %d\n", currHeight, currWidth);
-
-			if( blockSize > pow(2,currHeight * currWidth)){
-				packet.blockSize = pow(2, currHeight * currWidth);
-				printf("BlockSize is too large (%d > %d x %d ) , resizing it to %d \n", blockSize, currHeight, currWidth, packet.blockSize);	
-			}else{
-			 	packet.blockSize = blockSize;
-			}			
+	tree2dot(mainTree, packetSnd.height, packetSnd.width);
+	tree2tex(mainTree, packetSnd.height, packetSnd.width);
 
 
 
-			packet.height = currHeight;
-			packet.width = currWidth;
-	
-			packet.binary = (int *) realloc(  packet.binary, currHeight * currWidth);
-
-						
-			i = 0;
-			for(i = 0; i < listSize - 1; i++){
-
-				timeList[i] = (int *) realloc(timeList[i], currHeight * currWidth);
-				fillList(timeList[i], -1, currHeight, currWidth);
-			}
-			lastSent = (int *) realloc( lastSent, currHeight * currWidth);
-			fillList(lastSent, -1, currHeight, currWidth);
-
-
-			//copyList(lastSent, timeList[0], currHeight, currWidth);
-			
-			/*numElem = 0;
-			if(numElem = numElemList(timeList, currHeight, currWidth, listSize - 1) > listSize/2){
-				printf("Time list contains %d  elements, starting to clear it\n", numElem);	
-				packet.binary = timeList[ extractElemFromTimeList(timeList, currHeight, currWidth, listSize) ];		
-				sendToCli( packet ); 
-
-			}else{ */
-			
-				printf("Time list contains %d elements\n", numElem);
-				packet.binary = timeList[0];
-				sendToCli( packet ); 
-				binaryClock(timeList[0], currHeight * currWidth); 
-				
-				//addElem(timeList, packet.binary, currHeight, currWidth, listSize);
-
-			//}
-
-//		free_tree(packet.tree);	
-//
-//		free(ant);
-//		
-//		for(j = 0; j < listSize - 1; j++){
-//			if(timeList[j] != NULL){
-//				free(timeList[j]);
-//			}else{
-//				printf("Trying to free() timeList[%d], but it is a NULL pointer\n", j);
-//			}
-//		}
-//		free(timeList);
-	
-		}
-	}
-	
 }
 
-int sendToCli(struct packetStruct packet){
+struct packetStruct sendToCli(struct packetStruct packet){
 
 	printf("Sending : ");
 	displayBinary(packet.binary, packet.height, packet.width);
-	printf(" to client\n");	
-	mainCli(packet);
+	printf(" to client\n");
+	packet = (mainCli(packet));
+	return   packet;
+
 
 }
 

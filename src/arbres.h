@@ -4,8 +4,8 @@
 #include "struct.h"
 #include "analysis.h"
 
-void tree2dot (t_abr);
-void tree2tex (t_abr);
+void tree2dot (t_abr, int, int);
+void tree2tex (t_abr, int, int);
 
 void prof_droite (t_abr );
 void prof_infixe (t_abr );

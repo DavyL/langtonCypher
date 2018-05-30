@@ -26,7 +26,8 @@ int equivClassesCounter(int height, int width){
 	int permNumb = pow(2, height*width);
 	for(j=0; j < permNumb; j++){
 		tempTree = computeNLattice(ant, binary, 1, height, width);
-		merge_tree(tempTree, &timeTree);
+	 	merge_tree(tempTree, &timeTree);
+		free_tree(tempTree);
 	}
 	
 	//tree2dot(timeTree);
@@ -125,7 +126,7 @@ struct countStruct periodFinder(struct antStruct * ant, struct latticeStruct * l
 		data.val++;
 	}while(compareGrids(lattice, backupLattice) || compareAnts(ant, backupAnt));
 	
-	free(backupLattice);
+	freeLattice(backupLattice);
 	free(backupAnt);
 	
 	return data;
@@ -228,8 +229,22 @@ int sizeAnalysis( int maxSize, int color ){				//Prints the size of the loops wi
 			successor(ant, lattice, 1);	
 			printf("The period of a %d x %d grid is %d\n", i, j, periodFinder(ant, lattice));
 		
-			free(lattice);
+			freeLattice(lattice);
 		}
 	}
 	free(ant);
+}
+
+
+int freeLattice(struct latticeStruct * lattice){
+
+	int i = 0;
+	for(i = 0; i < lattice->height; i ++){
+
+		free(lattice->grid[i]);
+
+	}
+	free(lattice);
+	return 0;
+
 }

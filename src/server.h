@@ -3,8 +3,8 @@
 
 #include "ant.h"
 
-int mainServ(int, int, int, int, int, int);
+int mainServ(struct antStruct *, int, int, int, int);
 
-int sendToCli(struct packetStruct );
+struct packetStruct sendToCli(struct packetStruct );
 
 #endif
