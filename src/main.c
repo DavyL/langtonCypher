@@ -16,16 +16,16 @@ int main( int argc, char ** argv, char **envv){
 	int i = 0;
 	//equivClassesCounter(2, 2);
 	
-	int minHeight = 4;
-	int minWidth  = 4;
-	
-	int maxHeight = 5;
-	int maxWidth  = 5;
-
+	struct antStruct * ant = malloc(sizeof(ant));
+	ant->dir 	= 0;
+	ant->x		= 0;
+	ant->y		= 0;
+	int height 	= 3;
+	int width 	= 3;
 	int listSize 	= 10;
 	int blockSize 	= 1024;
 
-	mainServ(minHeight, minWidth, maxHeight, maxWidth, listSize, blockSize);
+	mainServ(ant, height, width, listSize, blockSize);
 }
 
 
