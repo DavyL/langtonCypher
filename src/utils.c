@@ -128,17 +128,3 @@ int displayBinary(int * binary, int height, int width){
 	return 0;
 }
 
-char * fileName(int height, int width){
-	
-	char * f = malloc(15 * sizeof(char));
-	*f = "file";
-	f[4] =  height + '0';
-	f[5] = "x";
-	f[8] = width + '0';
-	f[10] = ".tex";
-	f[14] = '\0';
-
-	return (const char * ) fileName;
-
-}
-
