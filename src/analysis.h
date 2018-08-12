@@ -6,13 +6,13 @@
 #include "arbres.h"
 
 
-int equivClassesCounter(int, int);
+int equivClassesCounter(int, int, int);
 
 int * binaryClock(int * , int );
 struct latticeStruct * listToLattice(int * list, int, int );
 
-struct packetStruct computePacket( struct packetStruct );
-t_abr computeNLattice(struct antStruct * , int *, int, int, int);
+struct packetStruct computePacket( struct packetStruct, int );
+t_abr * computeNLattice(struct antStruct * , int *, int, int, int, int);
 
 int compareGrids(struct latticeStruct * , struct latticeStruct * );
 int compareAnts(struct antStruct * , struct antStruct * );

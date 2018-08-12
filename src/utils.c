@@ -88,7 +88,7 @@ int * copyList( int * list1, int * list2, int height, int width){	//Moves elemen
 		list1[i] = list2[i];
 	}
 
-	return list2;
+	return list1;
 }
 
 int isEmpty( int * binary, int height, int width){		//returns 1 if the list is empty, i.e, contains only -1

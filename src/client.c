@@ -8,13 +8,21 @@
 #include "utils.h"
 #include "client.h"
 
-struct packetStruct mainCli( struct packetStruct packet){
+struct packetStruct * mainCli( struct packetStruct * packet, int verbose){
 
-	printf("Entering mainCli() on a %d x %d grid, a blocksize : %d, and starting at : ", packet.height, packet.width, packet.blockSize);
-	displayBinary(packet.binary, packet.height, packet.width);
-	printf("\n");
+	fprintf(stdout, "Entering mainCli() on a %d x %d grid, a blocksize : %d, and starting at : ", packet->height, packet->width, packet->blockSize);
+	displayBinary(packet->binary, packet->height, packet->width);
+	fprintf(stdout, "\n");
 
-	packet.tree = computeNLattice( packet.ant, packet.binary, packet.blockSize, packet.height, packet.width);
+	t_abr tempTree = NULL;
+	
+	tempTree = computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
+	
+	packet->tree = tempTree;
+	
+	//merge_tree(tempTree, (packet->tree));
+	//free_tree(tempTree);
+	
 	return packet;
 }
 

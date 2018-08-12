@@ -6,7 +6,8 @@
 #include "ant.h"
 #include "arbres.h"
 
-int equivClassesCounter(int height, int width){
+int equivClassesCounter(int height, int width, int verbose){
+	fprintf(stdout, "Computing %d x %d grids in equivClassesCounter()\n", height, width);
 	struct antStruct * ant = malloc(sizeof(struct antStruct));
 	ant->x = 0;
 	ant->y = 0;
@@ -25,9 +26,11 @@ int equivClassesCounter(int height, int width){
 	//timeTree = computeNLattice(ant, binary, 1, height, width);
 	int permNumb = pow(2, height*width);
 	for(j=0; j < permNumb; j++){
-		tempTree = computeNLattice(ant, binary, 1, height, width);
-	 	merge_tree(tempTree, &timeTree);
+		(timeTree == NULL) ? (timeTree =(t_abr) computeNLattice(ant, binary, 1, height, width, verbose) ): (tempTree =(t_abr) computeNLattice(ant, binary, 1, height, width, verbose));
+	 	merge_tree(tempTree, timeTree);
+		//ajout_feuille(&timeTree, tempTree->data);
 		free_tree(tempTree);
+		tempTree = NULL;
 	}
 	
 	//tree2dot(timeTree);
@@ -35,45 +38,66 @@ int equivClassesCounter(int height, int width){
 	
 	int * count = malloc(sizeof(int));
         *count = 0;	
-	printf("Counter is %d \n", sumCounter( timeTree, count)); 
-	printf("Number of equivalence class is %d \n", elemCounter( timeTree, count)); 
-	printf("Number of equivalence class with multiplicity %d \n", sumProductCounter( timeTree, count)); 
-
+	fprintf(stdout, "Counter is %d \n", sumCounter( timeTree, count)); 
+	*count = 0;
+	fprintf(stdout, "Number of equivalence class is %d \n", *(elemCounter( timeTree, count))); 
+	*count = 0;
+	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", sumProductCounter( timeTree, count)); 
 
 	free(ant);
 	free(binary);
+	free(count);
 	free_tree(timeTree);
        
 }
 
-struct packetStruct computePacket( struct packetStruct packet ){
+struct packetStruct computePacket( struct packetStruct packet, int verbose ){
 
-	packet.tree = computeNLattice(packet.ant, packet.binary, packet.blockSize, packet.height, packet.width);
+	packet.tree = *computeNLattice(packet.ant, packet.binary, packet.blockSize, packet.height, packet.width, verbose);
 	return packet;
 }
 
 
-t_abr computeNLattice(struct antStruct * ant,int * binary, int n, int height, int width){		//Computes n lattices starting from the binary
+t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height, int width, int verbose){		//Computes n lattices starting from the binary
 
 	t_abr tempTimeTree = NULL;
 
 	struct countStruct data;
+	data.counter = 1;
+	data.val = 0;
 
 	
 
 	//data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
 	
 	int j = 0;
-	printf("Starting to compute %d lattice starting from : ", n);
-	displayBinary( binary, height, width );
-	printf("\n");
-	for(j = 0; j < n; j++){
-		//printf("Iteration number %d \t/\t %d\n", j, n);
-		
+	
+	if(verbose){
+		fprintf(stdout, "Starting to compute %d lattice starting from : ", n);
+		displayBinary( binary, height, width );
+		printf("\n");
+	}
+	
+	for(j = 0; j < n; ++j){
+		if(verbose){
+			fprintf(stdout, "Iteration number %d \t/\t %d\n", j, n);
+		}
 		data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
-				
-		ajout_feuille(&tempTimeTree, data);
+
+		if(verbose){
+			fprintf(stdout, "data val : %d, counter : %d\n", data.val, data.counter);
 		
+			if(tempTimeTree == NULL){
+				fprintf(stderr, "tempTimeTree is a NULL pointer\n");
+			}
+		}
+		(tempTimeTree == NULL ) ? (tempTimeTree = new_abr(data, NULL, NULL)) : ajout_feuille(&tempTimeTree, data); 
+
+		//ajout_feuille(tempTimeTree, data);
+		
+	}
+	if(verbose){
+		fprintf(stdout, "A whole block of size %d has been computed\n", n);
 	}
 	return tempTimeTree;
 }
@@ -117,13 +141,13 @@ struct countStruct periodFinder(struct antStruct * ant, struct latticeStruct * l
 
 	if(backupLattice == NULL || backupAnt == NULL){
 
-		printf("In periodFinder(), backupAnt and/or backupLattice are/is NULL pointer\n");
+		fprintf(stderr, "In periodFinder(), backupAnt and/or backupLattice are/is NULL pointer\n");
 
 	}
 
 	do{
 		successor(ant, lattice, 1);
-		data.val++;
+		(data.val)++;
 	}while(compareGrids(lattice, backupLattice) || compareAnts(ant, backupAnt));
 	
 	freeLattice(backupLattice);
@@ -134,7 +158,7 @@ struct countStruct periodFinder(struct antStruct * ant, struct latticeStruct * l
 
 struct antStruct * copyAnt(struct antStruct * ant){
 	if (ant == NULL){
-		printf("In copyAnt, ant is a NULL pointer\n");
+		fprintf(stderr, "In copyAnt, ant is a NULL pointer\n");
 		return NULL;
 	}
 	
@@ -150,7 +174,7 @@ struct antStruct * copyAnt(struct antStruct * ant){
 
 struct latticeStruct * copyLattice(struct latticeStruct * lattice){
 	if(lattice == NULL){
-		printf("In copyGrid, lattice is a NULL pointer\n");
+		fprintf(stderr, "In copyGrid, lattice is a NULL pointer\n");
 		return NULL;
 	}
 	
@@ -171,7 +195,7 @@ struct latticeStruct * copyLattice(struct latticeStruct * lattice){
 int compareAnts(struct antStruct * ant, struct antStruct * antRef){				//returns 0 if ant and antRef contain the same elements 
 												//1 otherwise	
 	if(ant == NULL || antRef == NULL){
-		printf("In compareAnts, one of the arguments is a NULL pointer\n");
+		fprintf(stderr, "In compareAnts, one of the arguments is a NULL pointer\n");
 		return 1;
 	}	
 	if(ant->dir != antRef->dir || ant->x != antRef->x || ant->y != antRef->y){
@@ -188,13 +212,13 @@ int compareGrids(struct latticeStruct * lattice, struct latticeStruct * latticeR
 	int j = 0;
 
 	if(lattice == NULL || latticeRef == NULL){
-		printf("In compareGrids() one of the arguments is a NULL pointer\n");
+		fprintf(stderr, "In compareGrids() one of the arguments is a NULL pointer\n");
 		return 1;
 	}
 
 
 	if(lattice->height != latticeRef->height || lattice->width != latticeRef->width){
-		printf("In compareGrids the two lattices are not the same size\n");
+		fprintf(stderr, "In compareGrids the two lattices are not the same size\n");
 		return 1;
 	}
 
@@ -227,7 +251,7 @@ int sizeAnalysis( int maxSize, int color ){				//Prints the size of the loops wi
 			lattice = newLattice(i, j, 0);		//A random lattice is defined	
 
 			successor(ant, lattice, 1);	
-			printf("The period of a %d x %d grid is %d\n", i, j, periodFinder(ant, lattice));
+			fprintf(stdout, "The period of a %d x %d grid is %d\n", i, j, periodFinder(ant, lattice));
 		
 			freeLattice(lattice);
 		}

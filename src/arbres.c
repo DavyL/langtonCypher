@@ -136,36 +136,50 @@ t_abr new_abr (struct countStruct data, t_abr fg , t_abr fd) {
     arbre -> fg = fg;
     arbre -> fd = fd;
     arbre -> data.counter = data.counter;
-  }
-  return arbre;
+    printf("Successfully created a new tree\n");
+    return arbre;
+  }else
+	  return NULL;
 } /* end of new_abr */
 
-void ajout_feuille (t_abr * arbre, struct countStruct data) {
+void ajout_feuille (t_abr * arbre, struct countStruct data1) {
+	
 	if (*arbre) {	
-		if (data.val < (*arbre) -> data.val){ 
-	    		ajout_feuille (&((*arbre) -> fg), data);
-    		}else if(data.val == (*arbre)->data.val){
-			(*arbre)->data.counter += data.counter;	
-		}else ajout_feuille (&((*arbre) -> fd), data);
+		if (data1.val < ((*arbre)->data).val){	
+	    		ajout_feuille (&((*arbre) -> fg), data1);
+    		}else if(data1.val == (*arbre)->data.val){
+			(*arbre)->data.counter += data1.counter;	
+		}else ajout_feuille (&((*arbre) -> fd), data1);
 	} else {
-    		*arbre = new_abr (data, NULL, NULL);
+    		*arbre = new_abr (data1, NULL, NULL);
   	}
 } /* end of ajout_feuille */
 
-t_abr merge_tree(t_abr tree1, t_abr * tree2){		//merges tree1 in tree2
+t_abr merge_tree(t_abr tree1, t_abr tree2){		//merges tree1 in tree2
 							//After calling this function, tree1 still exists, remember to free() it if necessary
-	if(tree1){
-		if(tree2 != NULL){
-			merge_tree(tree1->fg, tree2);
-			ajout_feuille(tree2, tree1->data);
-			merge_tree(tree1->fd, tree2);
-		}else{
-			*tree2 = tree1;
-		}
+	
+/*	if(!tree2){
+		//tree2 = tree1;
+		tree2 = new_abr(	
 	}
+*/
+	if(tree1){
+		
+		printf("Ajout d'une feuille a tree2 avec val : %d\tcounter:%d\n",tree1->data.val, tree1->data.counter);
+		merge_tree(((tree1)->fg), tree2);
+		if(tree2){
+			ajout_feuille(&tree2, (tree1)->data);
+		}else{
+			tree2 = new_abr(tree1->data, NULL, NULL);
+		}
+		merge_tree(((tree1)->fd), tree2);
+	}
+	return tree2;
+
 }
 
-int  sumCounter(t_abr arbre, int * count){
+int  sumCounter(t_abr arbre, int * count){		//Sums the order of every equiv class
+							//If used on a tree that contains every n*m grids it should be equal to 2^(n*m)
 	if(arbre){
 		sumCounter( arbre->fg, count);
 		(*count) += arbre->data.counter;
@@ -183,11 +197,11 @@ int  sumProductCounter(t_abr arbre, int * count){
 	return *count;
 }
 
-int  elemCounter(t_abr arbre, int * count){
+int * elemCounter(t_abr arbre, int * count){
 	if(arbre){
 		sumCounter( arbre->fg, count);
 		(*count) += 1;
 		sumCounter( arbre->fd, count);
 	}
-	return *count;
+	return count;
 }
