@@ -199,13 +199,13 @@ int  sumProductCounter(t_abr arbre, int * count){
 	return *count;
 }
 
-int * elemCounter(t_abr arbre, int * count){
+int elemCounter(t_abr arbre, int * c){
 	if(arbre){
-		sumCounter( arbre->fg, count);
-		(*count) += 1;
-		sumCounter( arbre->fd, count);
+		*c += 1;
+		sumCounter( arbre->fg, c);
+		sumCounter( arbre->fd, c);
 	}
-	return count;
+	return *c;
 }
 
 void getTreeInfo(t_abr arbre, int * count, int * numEquivClass, int * numEquivClassMult ){

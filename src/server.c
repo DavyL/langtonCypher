@@ -65,12 +65,9 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	*count 	= 0;
 	*elem 	= 0;
 	*sumProd= 0;
-	//elem = elemCounter(*mainTree, elem);
 	getTreeInfo(*mainTree, count, elem, sumProd);
 
 	fprintf(stdout, "Counter is %d \n", *count);
-       //*count = 0;	
-	//fprintf(stdout, "Counter is %d \n", sumCounter( *mainTree, count)); 
 	fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
 	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd); 
 

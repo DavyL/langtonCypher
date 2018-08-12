@@ -13,12 +13,6 @@ struct packetStruct * mainCli( struct packetStruct * packet, int verbose){
 	fprintf(stdout, "Entering mainCli() on a %d x %d grid, a blocksize : %d, and starting at : ", packet->height, packet->width, packet->blockSize);
 	displayBinary(packet->binary, packet->height, packet->width);
 	fprintf(stdout, "\n");
-
-	t_abr tempTree = NULL;
-	
-//	tempTree = *computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
-	
-//	*packet->tree = tempTree;
 	
 	packet->tree = computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
 	//merge_tree(tempTree, (packet->tree));

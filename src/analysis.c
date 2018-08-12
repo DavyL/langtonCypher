@@ -19,35 +19,40 @@ int equivClassesCounter(int height, int width, int verbose){
 		binary[i] = -1;
 	}
 	
-	t_abr timeTree = NULL;
-	t_abr tempTree = NULL;
+	t_abr * timeTree = malloc(sizeof(t_abr));
+	*timeTree = NULL;
+	t_abr * tempTree = malloc(sizeof(t_abr));
+	*tempTree = NULL;
 	int j = 0;
 
 	//timeTree = computeNLattice(ant, binary, 1, height, width);
 	int permNumb = pow(2, height*width);
 	for(j=0; j < permNumb; j++){
-		(timeTree == NULL) ? (timeTree =(t_abr) computeNLattice(ant, binary, 1, height, width, verbose) ): (tempTree =(t_abr) computeNLattice(ant, binary, 1, height, width, verbose));
+		(*timeTree == NULL) ? (timeTree = computeNLattice(ant, binary, 1, height, width, verbose) ): (tempTree =computeNLattice(ant, binary, 1, height, width, verbose));
 	 	merge_tree(tempTree, timeTree);
 		//ajout_feuille(&timeTree, tempTree->data);
-		free_tree(tempTree);
-		tempTree = NULL;
+		free_tree(*tempTree);
+		*tempTree = NULL;
 	}
 	
 	//tree2dot(timeTree);
 	//tree2tex(timeTree);
 	
 	int * count = malloc(sizeof(int));
+	int * c2 = malloc(sizeof(int));
         *count = 0;	
-	fprintf(stdout, "Counter is %d \n", sumCounter( timeTree, count)); 
+	fprintf(stdout, "Counter is %d \n", sumCounter( *timeTree, count)); 
+	(*c2) = 0;
+	elemCounter(*timeTree, c2);
+	fprintf(stdout, "Number of equivalence class is %d \n", *c2); 
 	*count = 0;
-	fprintf(stdout, "Number of equivalence class is %d \n", elemCounter( timeTree, count)); 
-	*count = 0;
-	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", sumProductCounter( timeTree, count)); 
+	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", sumProductCounter( *timeTree, count)); 
+	
 
 	free(ant);
 	free(binary);
 	free(count);
-	free_tree(timeTree);
+	free_tree(*timeTree);
        
 }
 
