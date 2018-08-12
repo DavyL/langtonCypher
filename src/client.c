@@ -16,10 +16,11 @@ struct packetStruct * mainCli( struct packetStruct * packet, int verbose){
 
 	t_abr tempTree = NULL;
 	
-	tempTree = computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
+//	tempTree = *computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
 	
-	packet->tree = tempTree;
+//	*packet->tree = tempTree;
 	
+	packet->tree = computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
 	//merge_tree(tempTree, (packet->tree));
 	//free_tree(tempTree);
 	

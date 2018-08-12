@@ -26,17 +26,25 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	packetSnd.ant->y 	= ant->y;
 	packetSnd.binary 	= malloc( packetSnd.height * packetSnd.width * sizeof(int));
 	packetSnd.binary 	= fillList( packetSnd.binary, -1, packetSnd.height, packetSnd.width);
-	packetSnd.tree 		= NULL;	
+	packetSnd.tree 		= malloc(sizeof(t_abr));
+	*packetSnd.tree		= NULL;	
 
 	struct packetStruct * packetRcv;
 	packetRcv 		= malloc(sizeof(struct packetStruct));
 	packetRcv->ant	 	= malloc(sizeof(ant));
-	
+	packetRcv->tree 	= malloc(sizeof(t_abr));
+	*packetRcv->tree 	= NULL;	
 
-	t_abr mainTree = NULL;
+	t_abr * mainTree 	= malloc(sizeof(t_abr));
+	*mainTree 		= NULL;
 
 	do{
 		copyPacket(packetRcv ,sendToCli( &packetSnd, verbose ));
+			
+		if(verbose){
+			fprintf(stdout, "Received a packet\n");
+		}
+
 
 		mainTree = merge_tree(packetRcv->tree, mainTree);
 		packetSnd.binary = packetRcv->binary;
@@ -45,10 +53,10 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 			displayBinary(packetRcv->binary, packetRcv->height, packetRcv->width);
 			printf("\n");
 		}
-		free_tree(packetRcv->tree);
-		packetRcv->tree = NULL;
-		free_tree(packetSnd.tree);
-		packetSnd.tree = NULL;
+		free_tree(*packetRcv->tree);
+		*packetRcv->tree = NULL;
+		free_tree(*packetSnd.tree);
+		*packetSnd.tree = NULL;
 	}while( !isEmpty(packetRcv->binary, packetRcv->height, packetRcv->width));
 
 	int * count = malloc(sizeof(int));
@@ -56,17 +64,20 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	int * sumProd = malloc(sizeof(int));
 	*count 	= 0;
 	*elem 	= 0;
-	*sumProd= 0;	
-	fprintf(stdout, "Counter is %d \n", sumCounter( mainTree, count)); 
-	fprintf(stdout, "Number of equivalence class is %d \n", elemCounter( mainTree, elem)); 
-	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", sumProductCounter( mainTree, sumProd)); 
+	*sumProd= 0;
+	//elem = elemCounter(*mainTree, elem);
+	getTreeInfo(*mainTree, count, elem, sumProd);
+
+	fprintf(stdout, "Counter is %d \n", *count);
+       //*count = 0;	
+	//fprintf(stdout, "Counter is %d \n", sumCounter( *mainTree, count)); 
+	fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
+	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd); 
 
 	if(latex){
-		tree2dot(mainTree, packetSnd.height, packetSnd.width);
-		tree2tex(mainTree, packetSnd.height, packetSnd.width);
+		tree2dot(*mainTree, packetSnd.height, packetSnd.width);
+		tree2tex(*mainTree, packetSnd.height, packetSnd.width);
 	}
-
-
 }
 
 int blockSizeCheck(int height, int width, int blockSize){
@@ -106,6 +117,10 @@ struct packetStruct * copyPacket( struct packetStruct * pack1, struct packetStru
 	if(pack1->ant == NULL){
 		pack1->ant = malloc(sizeof(struct antStruct));
 	}
+	if(pack1->tree == NULL){
+		pack1->tree = malloc(sizeof(t_abr));
+		*pack1->tree = NULL;
+	}
 
 	pack1->height 	= ptrPack->height;
 	pack1->width 	= ptrPack->width;
@@ -119,10 +134,10 @@ struct packetStruct * copyPacket( struct packetStruct * pack1, struct packetStru
 	//add copyTree(), i.e: merge_tree(pack1->tree, ptrPack->tree);	
 
 	if(pack1->tree != NULL){
-		free_tree(pack1->tree);
-		pack1->tree = NULL;
+		free_tree(*pack1->tree);
+		*pack1->tree = NULL;
 	}
-	pack1->tree = merge_tree(ptrPack->tree, pack1->tree);
+	pack1->tree	 = merge_tree(ptrPack->tree, pack1->tree);
 
 	return pack1;
 }

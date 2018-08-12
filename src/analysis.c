@@ -40,7 +40,7 @@ int equivClassesCounter(int height, int width, int verbose){
         *count = 0;	
 	fprintf(stdout, "Counter is %d \n", sumCounter( timeTree, count)); 
 	*count = 0;
-	fprintf(stdout, "Number of equivalence class is %d \n", *(elemCounter( timeTree, count))); 
+	fprintf(stdout, "Number of equivalence class is %d \n", elemCounter( timeTree, count)); 
 	*count = 0;
 	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", sumProductCounter( timeTree, count)); 
 
@@ -53,14 +53,15 @@ int equivClassesCounter(int height, int width, int verbose){
 
 struct packetStruct computePacket( struct packetStruct packet, int verbose ){
 
-	packet.tree = *computeNLattice(packet.ant, packet.binary, packet.blockSize, packet.height, packet.width, verbose);
+	*packet.tree = *computeNLattice(packet.ant, packet.binary, packet.blockSize, packet.height, packet.width, verbose);
 	return packet;
 }
 
 
 t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height, int width, int verbose){		//Computes n lattices starting from the binary
 
-	t_abr tempTimeTree = NULL;
+	t_abr * tempTimeTree = malloc(sizeof(t_abr));	
+	*tempTimeTree = NULL;
 
 	struct countStruct data;
 	data.counter = 1;
@@ -87,11 +88,11 @@ t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height,
 		if(verbose){
 			fprintf(stdout, "data val : %d, counter : %d\n", data.val, data.counter);
 		
-			if(tempTimeTree == NULL){
+			if(*tempTimeTree == NULL){
 				fprintf(stderr, "tempTimeTree is a NULL pointer\n");
 			}
 		}
-		(tempTimeTree == NULL ) ? (tempTimeTree = new_abr(data, NULL, NULL)) : ajout_feuille(&tempTimeTree, data); 
+		(*tempTimeTree == NULL ) ? (*tempTimeTree = new_abr(data, NULL, NULL)) : ajout_feuille(tempTimeTree, data); 
 
 		//ajout_feuille(tempTimeTree, data);
 		

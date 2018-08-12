@@ -20,7 +20,7 @@ typedef t_noeud * t_abr;
 
 struct packetStruct{
 
-	t_abr tree;
+	t_abr * tree;
 
 	struct antStruct * ant;
 

@@ -144,7 +144,8 @@ t_abr new_abr (struct countStruct data, t_abr fg , t_abr fd) {
 
 void ajout_feuille (t_abr * arbre, struct countStruct data1) {
 	
-	if (*arbre) {	
+	if (*arbre) {
+
 		if (data1.val < ((*arbre)->data).val){	
 	    		ajout_feuille (&((*arbre) -> fg), data1);
     		}else if(data1.val == (*arbre)->data.val){
@@ -155,7 +156,7 @@ void ajout_feuille (t_abr * arbre, struct countStruct data1) {
   	}
 } /* end of ajout_feuille */
 
-t_abr merge_tree(t_abr tree1, t_abr tree2){		//merges tree1 in tree2
+t_abr * merge_tree(t_abr * tree1, t_abr * tree2){		//merges tree1 in tree2
 							//After calling this function, tree1 still exists, remember to free() it if necessary
 	
 /*	if(!tree2){
@@ -163,16 +164,17 @@ t_abr merge_tree(t_abr tree1, t_abr tree2){		//merges tree1 in tree2
 		tree2 = new_abr(	
 	}
 */
-	if(tree1){
-		
-		printf("Ajout d'une feuille a tree2 avec val : %d\tcounter:%d\n",tree1->data.val, tree1->data.counter);
-		merge_tree(((tree1)->fg), tree2);
-		if(tree2){
-			ajout_feuille(&tree2, (tree1)->data);
+	if(*tree1){
+		if(*tree2){
+			ajout_feuille(tree2, (*tree1)->data);
 		}else{
-			tree2 = new_abr(tree1->data, NULL, NULL);
+			tree2 = malloc(sizeof(t_abr));
+			*tree2 = new_abr((*tree1)->data, NULL, NULL);
 		}
-		merge_tree(((tree1)->fd), tree2);
+		printf("Ajout d'une feuille a tree2 avec val : %d\tcounter:%d\n",(*tree1)->data.val, (*tree1)->data.counter);
+		merge_tree(&((*tree1)->fg), tree2);
+		
+		merge_tree(&((*tree1)->fd), tree2);
 	}
 	return tree2;
 
@@ -205,3 +207,19 @@ int * elemCounter(t_abr arbre, int * count){
 	}
 	return count;
 }
+
+void getTreeInfo(t_abr arbre, int * count, int * numEquivClass, int * numEquivClassMult ){
+
+	if(arbre){
+		(*count) 		+= arbre->data.counter;
+		(*numEquivClass)	+= 1;
+		(*numEquivClassMult)	+= (arbre->data.val);
+		
+		printf("SLT\n");
+
+		getTreeInfo( arbre->fg, count, numEquivClass, numEquivClassMult);
+		getTreeInfo( arbre->fd, count, numEquivClass, numEquivClassMult);
+	}
+}
+
+
