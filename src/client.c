@@ -15,9 +15,7 @@ struct packetStruct * mainCli( struct packetStruct * packet, int verbose){
 	fprintf(stdout, "\n");
 	
 	packet->tree = computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
-	//merge_tree(tempTree, (packet->tree));
-	//free_tree(tempTree);
-	
+		
 	return packet;
 }
 

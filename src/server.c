@@ -32,6 +32,9 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	struct packetStruct * packetRcv;
 	packetRcv 		= malloc(sizeof(struct packetStruct));
 	packetRcv->ant	 	= malloc(sizeof(ant));
+	packetRcv->ant->dir 	= 42;
+	packetRcv->ant->x 	= 42;
+	packetRcv->ant->y 	= 42;
 	packetRcv->tree 	= malloc(sizeof(t_abr));
 	*packetRcv->tree 	= NULL;	
 
@@ -48,15 +51,18 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 
 		mainTree = merge_tree(packetRcv->tree, mainTree);
 		packetSnd.binary = packetRcv->binary;
+	
 		if(verbose){
 			fprintf(stdout, "Received binary :");
 			displayBinary(packetRcv->binary, packetRcv->height, packetRcv->width);
 			printf("\n");
 		}
+		
 		free_tree(*packetRcv->tree);
 		*packetRcv->tree = NULL;
 		free_tree(*packetSnd.tree);
 		*packetSnd.tree = NULL;
+	
 	}while( !isEmpty(packetRcv->binary, packetRcv->height, packetRcv->width));
 
 	int * count = malloc(sizeof(int));
@@ -65,16 +71,32 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	*count 	= 0;
 	*elem 	= 0;
 	*sumProd= 0;
+	
 	getTreeInfo(*mainTree, count, elem, sumProd);
 
 	fprintf(stdout, "Counter is %d \n", *count);
 	fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
-	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd); 
-
+	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd);
+	
 	if(latex){
 		tree2dot(*mainTree, packetSnd.height, packetSnd.width);
 		tree2tex(*mainTree, packetSnd.height, packetSnd.width);
 	}
+	
+	free(packetSnd.ant);
+	free(packetSnd.binary);
+	free(packetSnd.tree);
+
+	free(packetRcv->ant);
+	free(packetRcv->tree);
+
+	free(elem);	
+	free(sumProd);
+	free(count);
+
+	free_tree(*mainTree);
+	free(mainTree);
+
 }
 
 int blockSizeCheck(int height, int width, int blockSize){
@@ -119,15 +141,14 @@ struct packetStruct * copyPacket( struct packetStruct * pack1, struct packetStru
 		*pack1->tree = NULL;
 	}
 
-	pack1->height 	= ptrPack->height;
-	pack1->width 	= ptrPack->width;
+	pack1->height 		= ptrPack->height;
+	pack1->width 		= ptrPack->width;
 	pack1->listSize 	= ptrPack->listSize;
 	pack1->blockSize 	= ptrPack->blockSize;
-	//*(pack1->ant) 		= *(ptrPack->ant);
 	pack1->ant->dir 	= ptrPack->ant->dir;
-	pack1->ant->x 	= ptrPack->ant->x;
-	pack1->ant->y 	= ptrPack->ant->y;
-	pack1->binary = copyList(pack1->binary, ptrPack->binary, ptrPack->height, ptrPack->width);
+	pack1->ant->x 		= ptrPack->ant->x;
+	pack1->ant->y 		= ptrPack->ant->y;
+	pack1->binary 		= copyList(pack1->binary, ptrPack->binary, ptrPack->height, ptrPack->width);
 	//add copyTree(), i.e: merge_tree(pack1->tree, ptrPack->tree);	
 
 	if(pack1->tree != NULL){

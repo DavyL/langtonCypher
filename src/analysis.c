@@ -30,7 +30,6 @@ int equivClassesCounter(int height, int width, int verbose){
 	for(j=0; j < permNumb; j++){
 		(*timeTree == NULL) ? (timeTree = computeNLattice(ant, binary, 1, height, width, verbose) ): (tempTree =computeNLattice(ant, binary, 1, height, width, verbose));
 	 	merge_tree(tempTree, timeTree);
-		//ajout_feuille(&timeTree, tempTree->data);
 		free_tree(*tempTree);
 		*tempTree = NULL;
 	}
@@ -39,20 +38,27 @@ int equivClassesCounter(int height, int width, int verbose){
 	//tree2tex(timeTree);
 	
 	int * count = malloc(sizeof(int));
-	int * c2 = malloc(sizeof(int));
-        *count = 0;	
-	fprintf(stdout, "Counter is %d \n", sumCounter( *timeTree, count)); 
-	(*c2) = 0;
-	elemCounter(*timeTree, c2);
-	fprintf(stdout, "Number of equivalence class is %d \n", *c2); 
-	*count = 0;
-	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", sumProductCounter( *timeTree, count)); 
+        int * elem = malloc(sizeof(int));
+	int * sumProd = malloc(sizeof(int));
+	*count 	= 0;
+	*elem 	= 0;
+	*sumProd= 0;
 	
+	getTreeInfo(*timeTree, count, elem, sumProd);
 
+	fprintf(stdout, "Counter is %d \n", *count);
+	fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
+	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd); 
+
+	free(count);
+	free(elem);
+	free(sumProd);
+	
 	free(ant);
 	free(binary);
 	free(count);
 	free_tree(*timeTree);
+	free_tree(*tempTree);
        
 }
 
@@ -72,10 +78,8 @@ t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height,
 	data.counter = 1;
 	data.val = 0;
 
-	
+	struct latticeStruct * lattice = malloc(sizeof(struct latticeStruct));;
 
-	//data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
-	
 	int j = 0;
 	
 	if(verbose){
@@ -88,8 +92,12 @@ t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height,
 		if(verbose){
 			fprintf(stdout, "Iteration number %d \t/\t %d\n", j, n);
 		}
-		data = 	periodFinder(ant, listToLattice(binaryClock(binary, height * width),  height, width));
-
+		
+		lattice = listToLattice(binaryClock(binary, height * width),  height, width);
+		data = 	periodFinder(ant, lattice);
+		
+		freeLattice(lattice);
+	
 		if(verbose){
 			fprintf(stdout, "data val : %d, counter : %d\n", data.val, data.counter);
 		
@@ -98,8 +106,6 @@ t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height,
 			}
 		}
 		(*tempTimeTree == NULL ) ? (*tempTimeTree = new_abr(data, NULL, NULL)) : ajout_feuille(tempTimeTree, data); 
-
-		//ajout_feuille(tempTimeTree, data);
 		
 	}
 	if(verbose){
@@ -266,15 +272,3 @@ int sizeAnalysis( int maxSize, int color ){				//Prints the size of the loops wi
 }
 
 
-int freeLattice(struct latticeStruct * lattice){
-
-	int i = 0;
-	for(i = 0; i < lattice->height; i ++){
-
-		free(lattice->grid[i]);
-
-	}
-	free(lattice);
-	return 0;
-
-}

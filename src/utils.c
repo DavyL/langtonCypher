@@ -76,6 +76,10 @@ int * addElem(int ** timeList, int * elem, int height, int width, int listSize){
 int * copyList( int * list1, int * list2, int height, int width){	//Moves elements from list2 to list 1
 									//returns the address of list2
 	
+	if(list2 == NULL){
+		return NULL;
+	}
+	
 	if(list1 == NULL){						//If list1 is a NULL pointer, copyList() returns a pointer to a copy of list2
 	
 		list1 = malloc(height * width * sizeof(int));

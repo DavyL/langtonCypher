@@ -145,3 +145,14 @@ int predecessor( struct antStruct * ant, struct latticeStruct * lattice, int n){
 }
 
 
+int freeLattice(struct latticeStruct * lattice){
+
+	int i = 0;
+	for(i = 0; i < lattice->height; i ++){
+		free(lattice->grid[i]);
+
+	}
+	free(lattice);
+	return 0;
+
+}

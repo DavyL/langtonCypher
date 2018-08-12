@@ -24,4 +24,5 @@ struct countStruct  periodFinder(struct antStruct *, struct latticeStruct *);
 
 int sizeAnalysis( int, int );	
 
+
 #endif

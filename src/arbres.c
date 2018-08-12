@@ -136,7 +136,7 @@ t_abr new_abr (struct countStruct data, t_abr fg , t_abr fd) {
     arbre -> fg = fg;
     arbre -> fd = fd;
     arbre -> data.counter = data.counter;
-    printf("Successfully created a new tree\n");
+    
     return arbre;
   }else
 	  return NULL;
@@ -157,13 +157,7 @@ void ajout_feuille (t_abr * arbre, struct countStruct data1) {
 } /* end of ajout_feuille */
 
 t_abr * merge_tree(t_abr * tree1, t_abr * tree2){		//merges tree1 in tree2
-							//After calling this function, tree1 still exists, remember to free() it if necessary
 	
-/*	if(!tree2){
-		//tree2 = tree1;
-		tree2 = new_abr(	
-	}
-*/
 	if(*tree1){
 		if(*tree2){
 			ajout_feuille(tree2, (*tree1)->data);
@@ -171,7 +165,6 @@ t_abr * merge_tree(t_abr * tree1, t_abr * tree2){		//merges tree1 in tree2
 			tree2 = malloc(sizeof(t_abr));
 			*tree2 = new_abr((*tree1)->data, NULL, NULL);
 		}
-		printf("Ajout d'une feuille a tree2 avec val : %d\tcounter:%d\n",(*tree1)->data.val, (*tree1)->data.counter);
 		merge_tree(&((*tree1)->fg), tree2);
 		
 		merge_tree(&((*tree1)->fd), tree2);
@@ -180,6 +173,7 @@ t_abr * merge_tree(t_abr * tree1, t_abr * tree2){		//merges tree1 in tree2
 
 }
 
+//Works.
 int  sumCounter(t_abr arbre, int * count){		//Sums the order of every equiv class
 							//If used on a tree that contains every n*m grids it should be equal to 2^(n*m)
 	if(arbre){
@@ -190,6 +184,7 @@ int  sumCounter(t_abr arbre, int * count){		//Sums the order of every equiv clas
 	return *count;
 }
 
+//sumProd...() doesn't seem to work... Weird....
 int  sumProductCounter(t_abr arbre, int * count){
 	if(arbre){
 		sumCounter( arbre->fg, count);
@@ -198,7 +193,7 @@ int  sumProductCounter(t_abr arbre, int * count){
 	}
 	return *count;
 }
-
+//elemCounter() doesn't work either... Weirder...
 int elemCounter(t_abr arbre, int * c){
 	if(arbre){
 		*c += 1;
@@ -208,15 +203,14 @@ int elemCounter(t_abr arbre, int * c){
 	return *c;
 }
 
+//Works.
 void getTreeInfo(t_abr arbre, int * count, int * numEquivClass, int * numEquivClassMult ){
 
 	if(arbre){
 		(*count) 		+= arbre->data.counter;
 		(*numEquivClass)	+= 1;
-		(*numEquivClassMult)	+= (arbre->data.val);
+		(*numEquivClassMult)	+= (arbre->data.val) * arbre->data.counter;
 		
-		printf("SLT\n");
-
 		getTreeInfo( arbre->fg, count, numEquivClass, numEquivClassMult);
 		getTreeInfo( arbre->fd, count, numEquivClass, numEquivClassMult);
 	}
