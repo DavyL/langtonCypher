@@ -11,11 +11,11 @@
 
 #include "client.h"
 
-int mainServ(struct antStruct * ant, int height, int width, int listSize, int blockSize, int latex, int verbose){
+int mainServ(struct antStruct * ant, int N, int M, int height, int width, int listSize, int blockSize, int latex, int verbose){
 
 	fprintf(stdout, "Entering mainServ() on a %d x %d grid, list size : %d, blocksize : %d\n", height, width, listSize, blockSize);	
 
-	struct packetStruct packetSnd;
+	/*struct packetStruct packetSnd;
 	packetSnd.height 	= height;
 	packetSnd.width 	= width;
 	packetSnd.listSize 	= listSize;
@@ -28,6 +28,16 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	packetSnd.binary 	= fillList( packetSnd.binary, -1, packetSnd.height, packetSnd.width);
 	packetSnd.tree 		= malloc(sizeof(t_abr));
 	*packetSnd.tree		= NULL;	
+	*/
+
+	
+	struct packetStruct *** packetList;
+	packetList = createPacketList(N, M, blockSize);
+	
+	allocPacket((packetList)[height][width]);
+	packetList[height][width]->binary = fillList(packetList[height][width]->binary, -1, packetList[height][width]->height, packetList[height][width]->width);
+	
+
 
 	struct packetStruct * packetRcv;
 	packetRcv 		= malloc(sizeof(struct packetStruct));
@@ -42,7 +52,7 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	*mainTree 		= NULL;
 
 	do{
-		copyPacket(packetRcv ,sendToCli( &packetSnd, verbose ));
+		copyPacket(packetRcv ,sendToCli( packetList[height][width], verbose ));
 			
 		if(verbose){
 			fprintf(stdout, "Received a packet\n");
@@ -50,7 +60,7 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 
 
 		mainTree = merge_tree(packetRcv->tree, mainTree);
-		packetSnd.binary = packetRcv->binary;
+		packetList[height][width]->binary = packetRcv->binary;
 	
 		if(verbose){
 			fprintf(stdout, "Received binary :");
@@ -60,8 +70,8 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 		
 		free_tree(*packetRcv->tree);
 		*packetRcv->tree = NULL;
-		free_tree(*packetSnd.tree);
-		*packetSnd.tree = NULL;
+		free_tree(*(packetList[height][width]->tree));
+		*(packetList[height][width]->tree) = NULL;
 	
 	}while( !isEmpty(packetRcv->binary, packetRcv->height, packetRcv->width));
 
@@ -79,13 +89,15 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd);
 	
 	if(latex){
-		tree2dot(*mainTree, packetSnd.height, packetSnd.width);
-		tree2tex(*mainTree, packetSnd.height, packetSnd.width);
+//		tree2dot(*mainTree, packetSnd.height, packetSnd.width);
+//		tree2tex(*mainTree, packetSnd.height, packetSnd.width);
 	}
 	
-	free(packetSnd.ant);
+	/*free(packetSnd.ant);
 	free(packetSnd.binary);
 	free(packetSnd.tree);
+*/
+	freePacketContent( *packetList[height][width]);
 
 	free(packetRcv->ant);
 	free(packetRcv->tree);
@@ -98,6 +110,68 @@ int mainServ(struct antStruct * ant, int height, int width, int listSize, int bl
 	free(mainTree);
 
 }
+
+struct packetStruct *** createPacketList(int N, int M, int blockSize){
+
+	int i = 0;
+	int j = 0;
+
+	struct packetStruct *** packetList;
+	packetList = malloc(N*sizeof(struct packetStruct **));
+
+
+	for(i = 0; i < N; i++){
+		packetList[i] = malloc(M*sizeof(struct packetStruct *));
+		for(j=0; j < M; j++){
+			(packetList[i][j]) = malloc(sizeof(struct packetStruct));
+			(packetList[i][j])->height 	= i;
+			(packetList[i][j])->width 	= j;
+
+			(packetList[i][j])->listSize 	= -1;
+			(packetList[i][j])->blockSize 	= blockSizeCheck(i, j, blockSize);
+
+			(packetList[i][j])->ant 	= NULL;
+
+			(packetList[i][j])->binary 	= NULL; 
+			
+			(packetList[i][j])->tree 	= NULL;
+			
+			(packetList[i][j])->computed 	= 0;
+			(packetList[i][j])->locked	= 0;
+		}
+
+	}
+
+	return packetList;
+
+
+}
+
+void allocPacket( struct packetStruct * packet ){
+	if(packet->ant == NULL){
+		packet->ant 	= malloc(sizeof(struct antStruct));
+		
+		packet->ant->dir = 0;
+		packet->ant->x 	= 0;
+		packet->ant->y	= 0;
+	}
+	if(packet->binary == NULL){
+		packet->binary 	= malloc(sizeof(int) * packet->height * packet->width);
+	}
+	if(packet->tree == NULL){
+		packet->tree 	= malloc(sizeof(t_abr));
+		*packet->tree	= NULL;
+	}
+}
+
+void freePacketContent( struct packetStruct packet){		//Free the elements that use memory allocated with malloc() inside a packet
+
+	free(packet.ant);
+	free(packet.binary);
+	free_tree(*packet.tree);
+
+}
+
 
 int blockSizeCheck(int height, int width, int blockSize){
 

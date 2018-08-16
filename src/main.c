@@ -43,6 +43,10 @@ int main( int argc, char ** argv, char **envv){
 	int listSize 	= 10;
 	int blockSize 	= 1024;		//Size of the blocks used in computation
 	
+	int N	= 4;			//Size of the list to be computed on the serv
+	int M 	= 4;
+
+
 	int j = 0;
 	
 	int autoMode = 0;		//boolean value, if autoMode == 1 then the program will use
@@ -50,8 +54,14 @@ int main( int argc, char ** argv, char **envv){
 	
 	int verbose = 0;		//boolean value, if verbose == 1, program is in verbose mode
 
-	while ((j = getopt(argc, argv, "H:W:l:b:t:hev")) != -1) {
+	while ((j = getopt(argc, argv, "N:M:H:W:l:b:t:hev")) != -1) {
 		switch (j) {
+		case 'N':
+			N = atoi(optarg);
+			break;
+		case 'M':
+			M = atoi(optarg);
+			break;
 		case 'H':
 			height = atoi(optarg); 
 			break;
@@ -83,7 +93,7 @@ int main( int argc, char ** argv, char **envv){
 		equivClassesCounter(height, width, verbose);
 		return EXIT_SUCCESS;
 	}else{
-		mainServ(ant, height, width, listSize, blockSize, latex, verbose);
+		mainServ(ant, N, M, height, width, listSize, blockSize, latex, verbose);
 		return EXIT_SUCCESS;
 	}
 	free(ant);

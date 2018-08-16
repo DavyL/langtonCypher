@@ -32,6 +32,10 @@ struct packetStruct{
 	int listSize;
 
 	int * binary;
+
+	int locked;
+
+	int computed;
 };
 
 #endif

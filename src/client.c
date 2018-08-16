@@ -9,11 +9,14 @@
 #include "client.h"
 
 struct packetStruct * mainCli( struct packetStruct * packet, int verbose){
-
-	fprintf(stdout, "Entering mainCli() on a %d x %d grid, a blocksize : %d, and starting at : ", packet->height, packet->width, packet->blockSize);
-	displayBinary(packet->binary, packet->height, packet->width);
-	fprintf(stdout, "\n");
-	
+	if(packet->binary != NULL){
+		fprintf(stdout, "Entering mainCli() on a %d x %d grid, a blocksize : %d, and starting at : ", packet->height, packet->width, packet->blockSize);
+		displayBinary(packet->binary, packet->height, packet->width);
+		fprintf(stdout, "\n");
+	}else{
+		fprintf(stderr, "Packet received contained a NULL pointer inside binary\n");
+		return packet;
+	}
 	packet->tree = computeNLattice( packet->ant, packet->binary, packet->blockSize , packet->height, packet->width, verbose);
 		
 	return packet;
