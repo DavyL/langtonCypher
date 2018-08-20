@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "struct.h"
 #include "server.h"
@@ -34,7 +35,7 @@ int mainServ(struct antStruct * ant, int N, int M, int height, int width, int li
 	struct packetStruct *** packetList;
 	packetList = createPacketList(N, M, blockSize);
 	
-	allocPacket((packetList)[height][width]);
+	allocPacket(packetList[height][width]);
 	packetList[height][width]->binary = fillList(packetList[height][width]->binary, -1, packetList[height][width]->height, packetList[height][width]->width);
 	
 
@@ -109,6 +110,7 @@ int mainServ(struct antStruct * ant, int N, int M, int height, int width, int li
 	free_tree(*mainTree);
 	free(mainTree);
 
+	extractData(NULL, 10, 10, latex);
 }
 
 struct packetStruct *** createPacketList(int N, int M, int blockSize){
@@ -123,21 +125,21 @@ struct packetStruct *** createPacketList(int N, int M, int blockSize){
 	for(i = 0; i < N; i++){
 		packetList[i] = malloc(M*sizeof(struct packetStruct *));
 		for(j=0; j < M; j++){
-			(packetList[i][j]) = malloc(sizeof(struct packetStruct));
-			(packetList[i][j])->height 	= i;
-			(packetList[i][j])->width 	= j;
+			packetList[i][j] = malloc(sizeof(struct packetStruct));
+			packetList[i][j]->height 	= i;
+			packetList[i][j]->width 	= j;
 
-			(packetList[i][j])->listSize 	= -1;
-			(packetList[i][j])->blockSize 	= blockSizeCheck(i, j, blockSize);
+			packetList[i][j]->listSize 	= -1;
+			packetList[i][j]->blockSize 	= blockSizeCheck(i, j, blockSize);
 
-			(packetList[i][j])->ant 	= NULL;
+			packetList[i][j]->ant 		= NULL;
 
-			(packetList[i][j])->binary 	= NULL; 
+			packetList[i][j]->binary 	= NULL; 
 			
-			(packetList[i][j])->tree 	= NULL;
+			packetList[i][j]->tree 		= NULL;
 			
-			(packetList[i][j])->computed 	= 0;
-			(packetList[i][j])->locked	= 0;
+			packetList[i][j]->computed 	= 0;
+			packetList[i][j]->locked	= 0;
 		}
 
 	}
@@ -146,7 +148,67 @@ struct packetStruct *** createPacketList(int N, int M, int blockSize){
 
 
 }
+void extractData( struct packetStruct *** packetList, int N, int M, int latex){
 
+	fprintf(stdout, "Starting to extract data from packet list\n");
+
+	char * filename = NULL;
+	filename = malloc(sizeof("data/langton99x99.dat"));
+	
+	FILE * fd = NULL;
+
+	time_t date = time(NULL);
+	struct tm tm;
+	
+	int i = 0;
+	int j = 0;
+
+	int * count = malloc(sizeof(int));
+        int * elem = malloc(sizeof(int));
+	int * sumProd = malloc(sizeof(int));
+	*count 	= 0;
+	*elem 	= 0;
+	*sumProd= 0;
+
+	for(i = 1; i < N; i++){
+		for(j = 1; j < M; j++){
+			if( packetList[i][j] != NULL && packetList[i][j]->computed != 0){
+				
+				*count 	= 0;
+				*elem 	= 0;
+				*sumProd= 0;
+				
+				if(latex && packetList[i][j]->tree != NULL){
+					tree2dot(*(packetList[i][j]->tree), packetList[i][j]->height, packetList[i][j]->width);
+					tree2tex(*(packetList[i][j]->tree), packetList[i][j]->height, packetList[i][j]->width);
+				}
+				sprintf(filename, "data/langton%dx%d.data", i, j);
+	
+				fd = fopen(filename, "w+");
+				if(fd){
+					date = time(NULL);
+					tm = *localtime(&date);
+
+					fprintf(fd, "Data of a %d per %d langton's set. ", i, j);
+					fprintf(fd, "Processed the %d-%d-%d at %d:%d:%d\n", 
+							tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec); 
+					
+					getTreeInfo(*(packetList[i][j]->tree), count, elem, sumProd);
+					fprintf(fd, "Number of grids processed :\n%d\n", *count);
+					fprintf(fd, "Number of equivalence classes :\n%d\n", *elem);
+					fprintf(fd, "Number of equivalence classes with multiplicity :\n%d\n", *sumProd);
+				
+					fclose(fd);
+				}
+			}else{
+				fprintf(stdout, "For i = %d\t j = %d, the packet wasn't allocated or properly computed\n", i, j);
+			}
+
+			
+
+		}
+	}
+}
 void allocPacket( struct packetStruct * packet ){
 	if(packet->ant == NULL){
 		packet->ant 	= malloc(sizeof(struct antStruct));
@@ -165,10 +227,15 @@ void allocPacket( struct packetStruct * packet ){
 }
 
 void freePacketContent( struct packetStruct packet){		//Free the elements that use memory allocated with malloc() inside a packet
-
-	free(packet.ant);
-	free(packet.binary);
-	free_tree(*packet.tree);
+	if(packet.ant != NULL){
+		free(packet.ant);	
+	}
+	if(packet.binary != NULL){
+//		free(packet.binary);		//TODO Fix this. It seems to segfault (no time rn)
+	}
+	if(packet.tree != NULL){
+		free_tree(*(packet.tree));
+	}
 
 }
 

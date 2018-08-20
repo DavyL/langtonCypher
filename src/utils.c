@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "utils.h"
 
@@ -132,3 +133,19 @@ int displayBinary(int * binary, int height, int width){
 	return 0;
 }
 
+int binaryToDecimal(int * binary){
+	
+	int i = 0;
+	int dec = 0;
+
+	if(binary == NULL){
+		return -1;
+	}
+
+	for(i = 0; binary[i] != '\0'; i++){
+		if(binary[i] == 1){
+			dec += pow(2, i);
+		}
+	}
+	return dec;
+}

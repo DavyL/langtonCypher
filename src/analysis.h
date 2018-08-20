@@ -14,6 +14,8 @@ struct latticeStruct * listToLattice(int * list, int, int );
 struct packetStruct computePacket( struct packetStruct, int );
 t_abr * computeNLattice(struct antStruct * , int *, int, int, int, int);
 
+void computeAllPackets(int, int, int, int, int);
+
 int compareGrids(struct latticeStruct * , struct latticeStruct * );
 int compareAnts(struct antStruct * , struct antStruct * );
 

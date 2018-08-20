@@ -37,7 +37,7 @@ int main( int argc, char ** argv, char **envv){
 	int height 	= 3;
 	int width 	= 3;
 
-	int latex 	= 1;		//Boolean value, if latex == 1 a .tex file (and it's pdf) will
+	int latex 	= 0;		//Boolean value, if latex == 1 a .tex file (and it's pdf) will
 					//be produced by the program representing the timeTree
 
 	int listSize 	= 10;
@@ -54,7 +54,8 @@ int main( int argc, char ** argv, char **envv){
 	
 	int verbose = 0;		//boolean value, if verbose == 1, program is in verbose mode
 
-	while ((j = getopt(argc, argv, "N:M:H:W:l:b:t:hev")) != -1) {
+	int compAll = 0;		//Used to compute all packets locally, only here for testing reasons
+	while ((j = getopt(argc, argv, "N:M:H:W:l:b:t:heva")) != -1) {
 		switch (j) {
 		case 'N':
 			N = atoi(optarg);
@@ -83,12 +84,29 @@ int main( int argc, char ** argv, char **envv){
 		case 'v':
 			verbose = 1;
 			break;
+		case 'a':
+			compAll = 1;
+			break;
 		case 'h':
 			print_usage();
 			return EXIT_SUCCESS;
 		}
 	}
-	
+	if(N <= height){
+		fprintf(stderr, "ERROR. Check the size of the server list\n");
+		fprintf(stderr, "Values : N = %d\t height = %d\n", N, height);
+		return EXIT_FAILURE;
+	}
+	if(M <= width){	
+		fprintf(stderr, "ERROR. Check the size of the server list\n");
+		fprintf(stderr, "Values : M = %d\t width = %d\n", M, width);
+		return EXIT_FAILURE;
+	}
+	if(compAll){
+		computeAllPackets( N, M, blockSize, latex, verbose);
+		return EXIT_SUCCESS;
+	}
+
 	if(autoMode){
 		equivClassesCounter(height, width, verbose);
 		return EXIT_SUCCESS;

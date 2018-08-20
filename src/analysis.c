@@ -114,6 +114,112 @@ t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height,
 	return tempTimeTree;
 }
 
+void computeAllPackets(int N, int M, int blockSize, int latex, int verbose){
+	
+	struct antStruct * ant = malloc(sizeof(struct antStruct));
+	ant->dir 	= 0;
+	ant->x		= 0;
+	ant->y		= 0;
+
+	int * count = malloc(sizeof(int));
+        int * elem = malloc(sizeof(int));
+	int * sumProd = malloc(sizeof(int));
+
+	struct packetStruct *** packetList;
+	packetList = createPacketList(N, M, blockSize);
+
+	int height = 0;
+	int width = 0;
+	
+	for(height = 1; height < N; height++){
+		for(width = 1; width < M; width++){
+		
+		allocPacket(packetList[height][width]);
+		packetList[height][width]->binary = fillList(packetList[height][width]->binary, -1, packetList[height][width]->height, packetList[height][width]->width);
+	
+		}
+	}
+
+	struct packetStruct * packetRcv;
+	packetRcv 		= malloc(sizeof(struct packetStruct));
+	packetRcv->ant	 	= malloc(sizeof(ant));
+	packetRcv->ant->dir 	= 42;
+	packetRcv->ant->x 	= 42;
+	packetRcv->ant->y 	= 42;
+	packetRcv->tree 	= malloc(sizeof(t_abr));
+	*packetRcv->tree 	= NULL;	
+
+	for(height = 1; height < N; height++){
+		for(width = 1; width < M; width++){
+	
+			do{
+				copyPacket(packetRcv ,sendToCli( packetList[height][width], verbose ));
+					
+				if(verbose){
+					fprintf(stdout, "Received a packet\n");
+				}
+
+
+				packetList[height][width]->tree = merge_tree(packetRcv->tree, packetList[height][width]->tree);
+				packetList[height][width]->binary = packetRcv->binary;
+			
+				if(verbose){
+					fprintf(stdout, "Received binary :");
+					displayBinary(packetRcv->binary, packetRcv->height, packetRcv->width);
+					printf("\n");
+				}
+				
+				free_tree(*packetRcv->tree);
+				*packetRcv->tree = NULL;
+			
+			}while( !isEmpty(packetRcv->binary, packetRcv->height, packetRcv->width));
+			
+			packetList[height][width]->computed = 1;
+
+			if(verbose){
+
+				*count 	= 0;
+				*elem 	= 0;
+				*sumProd= 0;
+				
+				getTreeInfo(*(packetList[height][width]->tree), count, elem, sumProd);
+
+				fprintf(stdout, "Counter is %d \n", *count);
+				fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
+				fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd);
+			}
+		}
+	}
+
+	extractData(packetList, N, M, latex); 
+
+
+		if(latex){
+//		tree2dot(*mainTree, packetSnd.height, packetSnd.width);
+//		tree2tex(*mainTree, packetSnd.height, packetSnd.width);
+	}
+	
+	/*free(packetSnd.ant);
+	free(packetSnd.binary);
+	free(packetSnd.tree);
+*/
+	for(height = 0; height < N; height++){
+		for(width = 0; width < M; width++){
+			
+			freePacketContent( *(packetList[height][width]));
+		}
+	}
+
+	free(packetRcv->ant);
+	free(packetRcv->tree);
+
+	free(elem);	
+	free(sumProd);
+	free(count);
+
+}
+
+
 
 int * binaryClock(int * clock, int clockSize){
 	int i = 0;

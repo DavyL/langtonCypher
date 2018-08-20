@@ -9,6 +9,8 @@ struct packetStruct * sendToCli(struct packetStruct *, int );
 
 struct packetStruct *** createPacketList(int, int, int);
 
+void extractData(struct packetStruct ***, int, int, int);
+
 void allocPacket(struct packetStruct *);
 void freePacketContent( struct packetStruct);
 
