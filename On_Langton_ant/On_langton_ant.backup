@@ -1,0 +1,166 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[]{inputenc, amssymb, amsmath, amsthm}
+
+%opening
+\title{}
+\author{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+This paper will try to solve some conjectures done on langton's and will introduce some ether conjectures, some of them will be the finite and infinite highway conjecture, also will be introduced 
+the finite orbitals on langton lattice. Will also be given to Langton's structures a group structure.
+
+\end{abstract}
+
+\section{Definitions}
+
+We will call a Langton's lattice a lattice that contains an ant and a grid containing a color for each coordinates. The ant is a cellular automata with a simple behavior, it is set somewhere on the 
+grid and at each step it will go in front of it and if the case it is on, is black/white, it will go to the right/left. The direction of the ant for the next step will be right/left.
+For now we will study the ant's structure group on an finite lattice.
+The grid is equivalent to $\mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z}$, if not specified, we will consider that the ant is at $(0,0)$ with as direction the vector $\begin{pmatrix} 1 \\  0\end{pmatrix}$.
+We may refer to the classic Langton's lattice, a totally white lattice. The lattice is of width $n \in \mathbb{N}^*$ and height $m \in \mathbb{N}^*$. 
+\newline
+Also, the colors of the lattice is equivalent to $\mathbb{Z} / 2\mathbb{Z}$. Then for each langton's lattice that we may denote as $\l{}$, and $\L{}$ the set of all possibles lattices.
+
+Then we have $\L{} = {\mathbb{Z} / 2\mathbb{Z}}^{n\times m}$
+We may now define the successor function :
+\begin{equation}
+\label{sigma}
+ \sigma: 
+	\left\{ \begin{array}{rl}
+	 \L{},A &\ \longrightarrow \L{}, A\\
+	 \l{},a &\ \longmapsto \sigma_1(\l{}, a), \sigma_2(\l{}, a)
+	 \end{array} \right.
+,\text{with } 	a \in A = {\mathbb{Z}/4\mathbb{Z}}  \times (\mathbb{Z}/n\mathbb{Z} \times \mathbb{Z}/m\mathbb{Z})
+\end{equation}
+
+With this definition, $a$ represents the direction of the ant and it's coordinates.
+With $\sigma_1$ the painting function that modifies a Langton's lattice.
+\begin{equation}
+ \sigma_1:\left\{\begin{array}{rl}
+           \L{} &\ \longrightarrow \L{}\\
+           \begin{bmatrix}
+            \alpha_{i,j}
+           \end{bmatrix} _{\substack{ \leq i \leq n\\1 \leq j \leq m\\i,j \in \mathbb{N}}}  \longmapsto
+           \begin{bmatrix}
+            \beta_{i,j}
+           \end{bmatrix} _{\substack{1 \leq i \leq n\\1 \leq j \leq m\\i,j \in \mathbb{N}}}
+          \end{array}\right.
+\end{equation}
+\begin{equation}
+       \beta_{i,j} = \left\{ \begin{array}{rl}
+			  \alpha_{i,j}, &\ \text{if } i \neq x \text{ or } j \neq y\\
+		         -\alpha_{i,j}  &\ \text{otherwise}
+			 \end{array}\right.
+\end{equation}
+We also have, with $ d\in U_4 \simeq \mathbb{Z}/4\mathbb{Z}$ according to \ref{sigma}.
+\begin{equation}
+\label{sigma_2}
+ \sigma_2 (L,x, y, d) = (x + \underbrace{\Re( e^\frac{\imath \pi d}{2})}_\text{ modulo n }, y + \underbrace{\Im(e^\frac{\imath \pi d}{2})}_\text{ modulo m }, e^{\imath \pi \frac{d+\alpha_{x,y}}{2}})
+\end{equation}
+\clearpage
+With this definition we define that Langton's lattice is stable under the successor function. We may now introduce a property shared by two lattices similar to n-transitivity, that is,
+\begin{equation}
+  \text{Let } (\l{}_1, a_1), (\l{}_2, a_2) \in \L{} \times A
+ \text{ If } \exists n \in \mathbb{Z}, \sigma(\l{}_1, a_1)^n = \sigma(\l{}_2, a_2)
+\end{equation}
+Then $(\l{}_1, a_1)$ and $(\l{}_2, a_2)$ are said to be n-transitive.
+\newline
+We may now call an element of $\L{} \times A$ as n-periodic. 
+\begin{equation}
+ \text{If } \exists k \in \mathbb{Z} \backslash \{1\}, \text{ such as } \sigma(\l{}_1, a_1)^k = \sigma(\l{}_1, a_1), n = \inf\{|k| \in \mathbb{Z} \backslash \{1\}\}     
+\end{equation}
+Now we have to check if there exists such $n \in \mathbb{N}$ and $(\l{}, a) \in \L{} \times A$ exists.
+\begin{proof}
+ We have by defintion of the successor function that for any $(\l{}, a) \in \L{} \times A$ ,
+ \begin{equation}
+  \Sigma(\l{}, a) := \{ \sigma^n(\l{}, a), n \in \mathbb{Z}\} \subset \L{} \times A \}
+ \end{equation}
+ By construction
+ \begin{equation}
+  |\Sigma(\l{}, a)| \leq |\L{} \times A| = 2^{n \times m + 2} \times nm < \infty
+  \end{equation}
+\end{proof}
+
+\newtheorem{adher}{Existence of adherence lattice}
+\begin{adher}
+\begin{proof}
+ Let $(\l{}, a) \in \L{} \times A (V_n) \in \Sigma(\l{}, a)^\mathbb{N}$
+ By construction, $\forall n \in \mathbb{N}, \sigma^n(\l{}, a) \in \Sigma(\l{}, a)$
+ As $\Sigma(\l{}, a)$ is finite, we can refine the definition of $\Sigma$ to :
+ \begin{equation}
+  \Sigma_N(\l{}, a)  = \{ \sigma^n(\l{}, a), n \in \{0, ..., N\} \}
+  \end{equation}
+  \begin{equation}
+   \text{ With,  }N = \inf \{ n \in \mathbb{N}, \bigcup_{ 0 \leq k \leq n } \{ \sigma^k(\l{}, a)\} = \Sigma(\l{}, a)\}, \Sigma(\l{}, a) = \Sigma_N(\l{}, a) 
+ \end{equation}
+ We will often use this definition of $\Sigma(l, a)$ as we may sort it using the canonical order relation. We then have 
+ \begin{equation}
+  \sigma_{|\Sigma_N(l, a)} : \Sigma_N(l, a) \longrightarrow \Sigma_N (l, a)\text{ , is bijective}
+ \end{equation}
+ Then $\sigma_{\Sigma_N(l, a)} \in S_N$
+ \begin{equation}
+  \phi :\left\{ \begin{array}{rl}
+	 \Sigma_N(l, a) &\ \longrightarrow \{0, 1, ..., N \} \\
+	 (l^*,a^*) &\ \longmapsto n \text{ such as } \sigma^n_{\Sigma_N(l, a)}( l, a) = (l^*, a^*) 
+	 \end{array} \right.
+ \end{equation}
+
+
+
+ 
+
+
+
+\end{proof}
+\end{adher}
+
+
+\newtheorem{nper}{All langton's lattices are periodic}
+\begin{nper}
+
+\end{nper}
+\begin{proof}
+
+ 
+
+Using this result we have that the set of generated lattice from any initial ones is finite, as we may iterate the successor function infinitely many times, using Bolzano-Weierstrass, 
+that there is at least an adherence value in the set of the generated functions.
+\begin{equation}
+ \text{Let } (\l{}^*, a^*) \in \Sigma(\l{}, a)\text{ be an adherence value of the generated lattices we have } \Sigma(\l{}^*, a^*) = \Sigma(\l{}, a) \text{ by construction.}
+\end{equation}
+Also, $(\l{}, a)$ is $n$-periodic if and only if $\sigma(\l{}, a) = \sigma^{kn}(\l{}, a), \forall k \in \mathbb{Z^*}$, the proof of this is trivial.
+Also by construction of the successor function, $(\l{}, a) \neq \sigma(\l{}, a) $
+As the Langton ant is time reversible, that is, there exists a reciprocal function to the successor.
+We may now construct a distance on the set of Langton's lattice,
+\begin{equation}
+ \forall (\l{}^*, a^*) \in \Sigma(\l{}, a), d((\l{}^*, a^*), (\l{}, a)) = \inf_{n \in \mathbb{Z}^*}{n, \sigma^n(\l{}, a) = (\l{}^*, a^*)} 
+\end{equation}
+Then we have
+\begin{equation}
+ n = d((\l{}^*, a^*), (\l{}, a)) 
+\end{equation}
+By recurrency we have 
+\begin{equation}
+ \label{rec}
+ \sigma^k(\l{}^*, a^*) = \sigma^{n+k}(\l{}^*, a^*), \forall k \in \mathbb{Z}
+\end{equation}
+To sum up the proof, by Bolzano-Weierstrass, we have an adherence value, we compute the distance between two adherent values, this gives us using \ref{rec} that every lattice in $\Sigma(\l{}, a)$
+is n-periodic. This is true for any $(\l{},a) \in \L{} \times A$. Then every langton's lattice is periodic.
+\end{proof}
+
+Using this result we may now construct an equivalence relation on $\L{}\times A$ that we denote as $\sim$.
+\begin{equation}
+ g,h \in \L{} \times A, g \sim h \Leftrightarrow \exists n \in \mathbb{N}, g=\sigma^n(h)
+\end{equation}
+Using this relation equivalence we may obtain a partition of $\L{} \times A$  and we may start studying the orbitals of $(\L{} \times A)/\sigma$
+
+
+
+
+
+\end{document}
