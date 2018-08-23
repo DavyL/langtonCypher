@@ -114,10 +114,10 @@ t_abr  * computeNLattice(struct antStruct * ant,int * binary, int n, int height,
 	return tempTimeTree;
 }
 
-void computeAllPackets(int N, int M, int blockSize, int latex, int verbose){
+void computeAllPackets(int N, int M, int blockSize, int latex, int verbose, int dir){
 	
 	struct antStruct * ant = malloc(sizeof(struct antStruct));
-	ant->dir 	= 0;
+	ant->dir 	= dir;
 	ant->x		= 0;
 	ant->y		= 0;
 
@@ -134,7 +134,7 @@ void computeAllPackets(int N, int M, int blockSize, int latex, int verbose){
 	for(height = 1; height < N; height++){
 		for(width = 1; width < M; width++){
 		
-		allocPacket(packetList[height][width]);
+		allocPacket(packetList[height][width], dir);
 		packetList[height][width]->binary = fillList(packetList[height][width]->binary, -1, packetList[height][width]->height, packetList[height][width]->width);
 	
 		}
@@ -147,47 +147,50 @@ void computeAllPackets(int N, int M, int blockSize, int latex, int verbose){
 	packetRcv->ant->x 	= 42;
 	packetRcv->ant->y 	= 42;
 	packetRcv->tree 	= malloc(sizeof(t_abr));
-	*packetRcv->tree 	= NULL;	
+	*packetRcv->tree 	= NULL;
+
+	int * backupBin = NULL;	
 
 	for(height = 1; height < N; height++){
 		for(width = 1; width < M; width++){
-	
 			do{
+							
 				copyPacket(packetRcv ,sendToCli( packetList[height][width], verbose ));
-					
+				
+			
 				if(verbose){
 					fprintf(stdout, "Received a packet\n");
 				}
 
 
 				packetList[height][width]->tree = merge_tree(packetRcv->tree, packetList[height][width]->tree);
-				packetList[height][width]->binary = packetRcv->binary;
+				//packetList[height][width]->binary = packetRcv->binary;
 			
 				if(verbose){
 					fprintf(stdout, "Received binary :");
 					displayBinary(packetRcv->binary, packetRcv->height, packetRcv->width);
 					printf("\n");
 				}
-				
 				free_tree(*packetRcv->tree);
 				*packetRcv->tree = NULL;
-			
-			}while( !isEmpty(packetRcv->binary, packetRcv->height, packetRcv->width));
-			
-			packetList[height][width]->computed = 1;
-
-			if(verbose){
-
-				*count 	= 0;
-				*elem 	= 0;
-				*sumProd= 0;
 				
-				getTreeInfo(*(packetList[height][width]->tree), count, elem, sumProd);
+			}while( !isEmpty(packetRcv->binary, packetRcv->height, packetRcv->width));	
+				if(verbose){
 
-				fprintf(stdout, "Counter is %d \n", *count);
-				fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
-				fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd);
-			}
+					*count 	= 0;
+					*elem 	= 0;
+					*sumProd= 0;
+					
+					getTreeInfo(*(packetList[height][width]->tree), count, elem, sumProd);
+
+					fprintf(stdout, "Counter is %d \n", *count);
+					fprintf(stdout, "Number of equivalence class is %d \n", *elem); 
+					fprintf(stdout, "Number of equivalence class with multiplicity %d \n", *sumProd);
+	
+				}
+			
+		packetList[height][width]->computed = 1;
+
 		}
 	}
 

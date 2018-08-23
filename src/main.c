@@ -55,7 +55,8 @@ int main( int argc, char ** argv, char **envv){
 	int verbose = 0;		//boolean value, if verbose == 1, program is in verbose mode
 
 	int compAll = 0;		//Used to compute all packets locally, only here for testing reasons
-	while ((j = getopt(argc, argv, "N:M:H:W:l:b:t:heva")) != -1) {
+	int dir = 0;
+	while ((j = getopt(argc, argv, "N:M:H:W:l:b:t:hevad:")) != -1) {
 		switch (j) {
 		case 'N':
 			N = atoi(optarg);
@@ -87,6 +88,9 @@ int main( int argc, char ** argv, char **envv){
 		case 'a':
 			compAll = 1;
 			break;
+		case 'd':
+			dir = atoi(optarg);
+			break;
 		case 'h':
 			print_usage();
 			return EXIT_SUCCESS;
@@ -103,7 +107,7 @@ int main( int argc, char ** argv, char **envv){
 		return EXIT_FAILURE;
 	}
 	if(compAll){
-		computeAllPackets( N, M, blockSize, latex, verbose);
+		computeAllPackets( N, M, blockSize, latex, verbose, dir);
 		return EXIT_SUCCESS;
 	}
 

@@ -11,7 +11,10 @@ struct packetStruct *** createPacketList(int, int, int);
 
 void extractData(struct packetStruct ***, int, int, int);
 
-void allocPacket(struct packetStruct *);
+void extractDataFromPacket( struct packetStruct, int);
+void saveTreeData( FILE *, t_abr);
+
+void allocPacket(struct packetStruct *, int);
 void freePacketContent( struct packetStruct);
 
 struct packetStruct * copyPacket( struct packetStruct * pack1, struct packetStruct * ptrPack);

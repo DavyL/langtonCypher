@@ -35,7 +35,7 @@ int mainServ(struct antStruct * ant, int N, int M, int height, int width, int li
 	struct packetStruct *** packetList;
 	packetList = createPacketList(N, M, blockSize);
 	
-	allocPacket(packetList[height][width]);
+	allocPacket(packetList[height][width], 0);
 	packetList[height][width]->binary = fillList(packetList[height][width]->binary, -1, packetList[height][width]->height, packetList[height][width]->width);
 	
 
@@ -152,68 +152,91 @@ void extractData( struct packetStruct *** packetList, int N, int M, int latex){
 
 	fprintf(stdout, "Starting to extract data from packet list\n");
 
+	int i = 0;
+	int j = 0;
+
+
+	for(i = 1; i < N; i++){
+		for(j = 1; j < M; j++){
+			if( packetList[i][j] != NULL){
+				extractDataFromPacket( *packetList[i][j], latex);	      
+			}else{
+				fprintf(stdout, "For i = %d\t j = %d, the packet wasn't allocated\n", i, j);
+			}
+		}
+	}
+}
+
+void extractDataFromPacket( struct packetStruct packet, int latex){
+	
 	char * filename = NULL;
-	filename = malloc(sizeof("data/langton99x99.dat"));
+	filename = malloc(sizeof("data/langton99x99-9.dat"));
+
+	int * count = malloc(sizeof(int));
+	int * elem = malloc(sizeof(int));
+	int * sumProd = malloc(sizeof(int));
 	
 	FILE * fd = NULL;
 
 	time_t date = time(NULL);
 	struct tm tm;
 	
-	int i = 0;
-	int j = 0;
 
-	int * count = malloc(sizeof(int));
-        int * elem = malloc(sizeof(int));
-	int * sumProd = malloc(sizeof(int));
-	*count 	= 0;
-	*elem 	= 0;
-	*sumProd= 0;
 
-	for(i = 1; i < N; i++){
-		for(j = 1; j < M; j++){
-			if( packetList[i][j] != NULL && packetList[i][j]->computed != 0){
-				
-				*count 	= 0;
-				*elem 	= 0;
-				*sumProd= 0;
-				
-				if(latex && packetList[i][j]->tree != NULL){
-					tree2dot(*(packetList[i][j]->tree), packetList[i][j]->height, packetList[i][j]->width);
-					tree2tex(*(packetList[i][j]->tree), packetList[i][j]->height, packetList[i][j]->width);
-				}
-				sprintf(filename, "data/langton%dx%d.data", i, j);
-	
-				fd = fopen(filename, "w+");
-				if(fd){
-					date = time(NULL);
-					tm = *localtime(&date);
-
-					fprintf(fd, "Data of a %d per %d langton's set. ", i, j);
-					fprintf(fd, "Processed the %d-%d-%d at %d:%d:%d\n", 
-							tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec); 
-					
-					getTreeInfo(*(packetList[i][j]->tree), count, elem, sumProd);
-					fprintf(fd, "Number of grids processed :\n%d\n", *count);
-					fprintf(fd, "Number of equivalence classes :\n%d\n", *elem);
-					fprintf(fd, "Number of equivalence classes with multiplicity :\n%d\n", *sumProd);
-				
-					fclose(fd);
-				}
-			}else{
-				fprintf(stdout, "For i = %d\t j = %d, the packet wasn't allocated or properly computed\n", i, j);
-			}
-
-			
-
+	if( packet.computed != 0){
+		
+		*count 	= 0;
+		*elem 	= 0;
+		*sumProd= 0;
+		
+		if(latex && packet.tree != NULL){
+			tree2dot(*(packet.tree), packet.height, packet.width);
+			tree2tex(*(packet.tree), packet.height, packet.width);
 		}
+		sprintf(filename, "data/langton%dx%d-%d.data", packet.height, packet.width, packet.ant->dir);
+
+		fd = fopen(filename, "w+");
+		if(fd){
+			date = time(NULL);
+			tm = *localtime(&date);
+
+			fprintf(fd, "Data of a %d per %d pointing %d langton's set. ", packet.height, packet.width, packet.ant->dir);
+			fprintf(fd, "Processed the %d-%d-%d at %d:%d:%d\n", 
+					tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec); 
+			
+			getTreeInfo(*(packet.tree), count, elem, sumProd);
+			fprintf(fd, "Number of grids processed :\n%d\n", *count);
+			fprintf(fd, "Number of equivalence classes :\n%d\n", *elem);
+			fprintf(fd, "Number of equivalence classes with multiplicity :\n%d\n", *sumProd);
+			
+			fprintf(fd, "Size of equiv class(size relation) \t multiplicity\n");
+			saveTreeData(fd, *(packet.tree));		
+
+			fclose(fd);
+		}
+	}else{
+		fprintf(stdout, "For i = %d\t j = %d, the packet wasn't properly computed\n", packet.height, packet.width);
+	}
+
+	free(filename);
+	free(count);
+	free(elem);
+	free(sumProd);
+}
+
+void saveTreeData( FILE * fd, t_abr tree){
+	if(tree){
+		saveTreeData(fd, tree->fg);
+		fprintf( fd, "%d\t%d\n", tree->data.val, tree->data.counter);
+		saveTreeData(fd, tree->fd);
 	}
 }
-void allocPacket( struct packetStruct * packet ){
+
+void allocPacket( struct packetStruct * packet, int dir ){
 	if(packet->ant == NULL){
 		packet->ant 	= malloc(sizeof(struct antStruct));
 		
-		packet->ant->dir = 0;
+		packet->ant->dir = dir;
 		packet->ant->x 	= 0;
 		packet->ant->y	= 0;
 	}
