@@ -1,2 +1,3 @@
 Work in progress
-Messing around with langton's ant and trying some crypto
+Program developped in order to allow one to get various informations on the "algebraic" properties of the langton ant.
+Allows to find cardinality of many properties.
